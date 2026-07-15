@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="640.0" prefWidth="960.0" style="-fx-background-color: #000000;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.parkbiz.AdminController">
+    <children>
+        <!-- TOP BANNER -->
+        <HBox alignment="CENTER_LEFT" prefHeight="70.0" prefWidth="960.0" spacing="20.0" style="-fx-border-color: #ff8c00; -fx-border-width: 0 0 2 0; -fx-background-color: #050505;">
+            <padding><Insets left="25.0" right="25.0" /></padding>
+            <children>
+                <Label text="&gt; ADMIN_MAINFRAME_V1.0" textFill="#ff8c00">
+                    <font><Font name="Monospaced Bold" size="28.0" /></font>
+                </Label>
+                <Region HBox.hgrow="ALWAYS" />
+                <Label fx:id="lblClock" text="SYSTEM TIME: --:--:-- [STABLE]" textFill="#ff8c00">
+                    <font><Font name="Monospaced Regular" size="14.0" /></font>
+                </Label>
+                <Button fx:id="btnLogout" onAction="#handleLogout" style="-fx-background-color: transparent; -fx-border-color: #ff4500; -fx-text-fill: #ff4500; -fx-font-family: 'Monospaced'; -fx-cursor: hand;" text="[ LOGOUT ]" />
+            </children>
+        </HBox>
+
+        <!-- LEFT SIDE -->
+        <VBox layoutY="70.0" prefHeight="570.0" prefWidth="380.0" spacing="15.0" style="-fx-border-color: #ff8c00; -fx-border-width: 0 2 0 0;">
+            <padding><Insets bottom="20.0" left="20.0" right="20.0" top="20.0" /></padding>
+            <children>
+                <!-- CONTROLS -->
+                <VBox spacing="10.0">
+                    <children>
+                        <Label text="[ SYSTEM_CONTROLS ]" textFill="#ff8c00"><font><Font name="Monospaced Bold" size="16.0" /></font></Label>
+                        <Button fx:id="btnReport" onAction="#handleReport" onMouseEntered="#onBtnH" onMouseExited="#onBtnEx" maxWidth="Infinity" style="-fx-background-color: transparent; -fx-border-color: #ff8c00; -fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced';" text="GENERATEREPORT" />
+                        <HBox spacing="10.0">
+                            <children>
+                                <Button fx:id="btnAdd" onAction="#handleAddSlot" onMouseEntered="#onBtnH" onMouseExited="#onBtnEx" prefWidth="170.0" style="-fx-background-color: transparent; -fx-border-color: #ff8c00; -fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced';" text="ADDNEWSLOT" />
+                                <Button fx:id="btnDelete" onAction="#handleDeleteSlot" onMouseEntered="#onBtnH" onMouseExited="#onBtnEx" prefWidth="170.0" style="-fx-background-color: transparent; -fx-border-color: #ff8c00; -fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced';" text="DELETESLOT" />
+                            </children>
+                        </HBox>
+                        <Button fx:id="btnReset" onAction="#handleReset" onMouseEntered="#onBtnH" onMouseExited="#onBtnEx" maxWidth="Infinity" style="-fx-background-color: transparent; -fx-border-color: #ff8c00; -fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced';" text="RESETALLSENSORS" />
+                    </children>
+                </VBox>
+
+                <!-- METRICS -->
+                <VBox spacing="8.0" style="-fx-border-color: #ff8c00; -fx-padding: 12;">
+                    <children>
+                        <Label text="[ SYSTEM_METRICS ]" textFill="#ff8c00"><font><Font name="Monospaced Bold" size="14.0" /></font></Label>
+                        <Label fx:id="lblCpu" text="CPU LOAD: 0% [..........]" textFill="#ff8c00"><font><Font name="Monospaced Regular" size="12.0" /></font></Label>
+                        <Label fx:id="lblRam" text="RAM UTIL: 0/0 GB [..........]" textFill="#ff8c00"><font><Font name="Monospaced Regular" size="12.0" /></font></Label>
+                        <Label fx:id="lblDbStatus" text="DB CONN: PINGING..." textFill="#ff8c00"><font><Font name="Monospaced Regular" size="12.0" /></font></Label>
+                    </children>
+                </VBox>
+
+                <!-- OCCUPANCY -->
+                <VBox spacing="8.0" style="-fx-border-color: #ff8c00; -fx-padding: 12;">
+                    <children>
+                        <Label text="[ OCCUPANCY_STATUS ]" textFill="#ff8c00"><font><Font name="Monospaced Bold" size="14.0" /></font></Label>
+                        <Label fx:id="lblOccupancy" text="SLOTS OCCUPIED: 0 / 0 [░░░░░░░░░░░░░░░░] 0%" textFill="#ff8c00" wrapText="true"><font><Font name="Monospaced Regular" size="12.0" /></font></Label>
+                        <Button onAction="#handleViewLiveMap" onMouseEntered="#onBtnH" onMouseExited="#onBtnEx" maxWidth="Infinity" style="-fx-background-color: transparent; -fx-border-color: #ff8c00; -fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced'; -fx-font-size: 11;" text="[ VIEWLIVE_MAP ]" />
+                    </children>
+                </VBox>
+
+                <!-- LOOKUP -->
+                <VBox spacing="10.0">
+                    <children>
+                        <Label text="[ SLOT_STATUS_LOOKUP ]" textFill="#ff8c00"><font><Font name="Monospaced Bold" size="14.0" /></font></Label>
+                        <HBox spacing="5.0">
+                            <children>
+                                <Label fx:id="lblSlotDisplay" alignment="CENTER_LEFT" prefHeight="35.0" prefWidth="250.0" style="-fx-background-color: black; -fx-text-fill: #ff8c00; -fx-border-color: #ff8c00; -fx-padding: 0 0 0 10; -fx-font-family: 'Monospaced'; -fx-font-size: 16;" text="SLOT_01" />
+                                <Button onAction="#handleDecrementSlot" onMouseEntered="#onBtnH" onMouseExited="#onBtnEx" prefHeight="35.0" prefWidth="45.0" style="-fx-background-color: transparent; -fx-border-color: #ff8c00; -fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced'; -fx-font-weight: bold;" text="&lt;" />
+                                <Button onAction="#handleIncrementSlot" onMouseEntered="#onBtnH" onMouseExited="#onBtnEx" prefHeight="35.0" prefWidth="45.0" style="-fx-background-color: transparent; -fx-border-color: #ff8c00; -fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced'; -fx-font-weight: bold;" text="&gt;" />
+                            </children>
+                        </HBox>
+                        <Button fx:id="btnCheck" onAction="#handleLookup" onMouseEntered="#onBtnH" onMouseExited="#onBtnEx" maxWidth="Infinity" prefHeight="35.0" style="-fx-background-color: transparent; -fx-border-color: #ff8c00; -fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced';" text="CHECK SLOT" />
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+
+        <!-- RIGHT SIDE -->
+        <VBox layoutX="380.0" layoutY="70.0" prefHeight="570.0" prefWidth="580.0" spacing="10.0">
+            <padding><Insets bottom="20.0" left="25.0" right="25.0" top="20.0" /></padding>
+            <children>
+                <Label text="[ SYSTEM_LOG_OUTPUT ]" textFill="#ff8c00"><font><Font name="Monospaced Bold" size="14.0" /></font></Label>
+                <TextArea fx:id="txtTerminal" editable="false" prefHeight="480.0" prefWidth="530.0" style="-fx-control-inner-background: #000000; -fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced'; -fx-border-color: #ff8c00;" wrapText="true" />
+                <Label fx:id="lblMainframeStatus" text="MAINFRAME_STATUS: NOMINAL" textFill="#ff8c00" opacity="0.4">
+                    <font><Font name="Monospaced Regular" size="10.0" /></font>
+                </Label>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

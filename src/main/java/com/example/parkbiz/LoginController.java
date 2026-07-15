@@ -1,6 +1,7 @@
 package com.example.parkbiz;
 
 import javafx.animation.Animation;
+import javafx.animation.Interpolator;
 import javafx.animation.RotateTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,6 +18,7 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
@@ -31,18 +33,19 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        // Start Fan Animations
+        startFan(fan1, 2000, 360);
+        startFan(fan2, 2500, -360);
+    }
 
-        RotateTransition rt1 = new RotateTransition(Duration.millis(2000), fan1);
-        rt1.setByAngle(360);
-        rt1.setCycleCount(Animation.INDEFINITE);
-        rt1.setInterpolator(javafx.animation.Interpolator.LINEAR);
-        rt1.play();
-
-        RotateTransition rt2 = new RotateTransition(Duration.millis(2500), fan2);
-        rt2.setByAngle(-360);
-        rt2.setCycleCount(Animation.INDEFINITE);
-        rt2.setInterpolator(javafx.animation.Interpolator.LINEAR);
-        rt2.play();
+    private void startFan(StackPane fan, int ms, int angle) {
+        if (fan != null) {
+            RotateTransition rt = new RotateTransition(Duration.millis(ms), fan);
+            rt.setByAngle(angle);
+            rt.setCycleCount(Animation.INDEFINITE);
+            rt.setInterpolator(Interpolator.LINEAR);
+            rt.play();
+        }
     }
 
     @FXML
@@ -51,40 +54,47 @@ public class LoginController implements Initializable {
         String password = txtPassword.getText();
 
         try {
+            // Admin Credentials
             if ("admin".equals(username) && "admin123".equals(password)) {
-                // GO TO ADMIN DASHBOARD
-                switchToScene("admin-view.fxml", "ParkBiz - Admin Mainframe");
+                // Changed filename to match yours: admin-view.fxml
+                switchToScene("admin-view.fxml", "ParkBiz - Admin Mainframe V1.0");
             }
+            // Driver Credentials
             else if ("driver".equals(username) && "1234".equals(password)) {
-                // GO TO DRIVER DASHBOARD
                 switchToScene("dashboard-view.fxml", "ParkBiz - Driver Terminal");
             }
             else {
                 lblFeedback.setText("> ACCESS_DENIED: INVALID_CREDENTIALS");
+                lblFeedback.setStyle("-fx-text-fill: #ff4500; -fx-font-family: 'Monospaced';");
             }
-        } catch (IOException e) {
-            lblFeedback.setText("> SYSTEM_ERROR: MODULE_NOT_FOUND");
+        } catch (Exception e) {
+            lblFeedback.setText("> SYSTEM_ERROR: MODULE_LOAD_FAILED");
+            System.err.println("Error loading FXML: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    // Helper method to reduce duplicate code
     private void switchToScene(String fxmlFile, String title) throws IOException {
         Stage stage = (Stage) btnLogin.getScene().getWindow();
-        Parent root = FXMLLoader.load(getClass().getResource(fxmlFile));
-        stage.setScene(new Scene(root));
+
+        // Load the FXML
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(fxmlFile)));
+
+        // Update the stage
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
         stage.setTitle(title);
+        stage.setResizable(false);
+        stage.centerOnScreen();
     }
 
     @FXML
     private void handleMouseHover() {
-        btnLogin.setStyle("-fx-background-color: #ffae00; -fx-text-fill: #000000; -fx-font-family: 'Monospaced'; -fx-font-weight: bold; -fx-effect: dropshadow(three-pass-box, #ff8c00, 15, 0, 0, 0);");
+        btnLogin.setStyle("-fx-background-color: #ffae00; -fx-text-fill: #000000; -fx-font-family: 'Monospaced'; -fx-font-weight: bold; -fx-effect: dropshadow(three-pass-box, #ff8c00, 15, 0, 0, 0); -fx-cursor: hand;");
     }
 
     @FXML
     private void handleMouseExit() {
         btnLogin.setStyle("-fx-background-color: #ff8c00; -fx-text-fill: #000000; -fx-font-family: 'Monospaced'; -fx-font-weight: bold;");
     }
-
-
 }
-

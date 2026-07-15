@@ -1,13 +1,9 @@
 package com.example.parkbiz;
 
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.RotateTransition;
-import javafx.animation.Timeline;
+import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
@@ -22,136 +18,144 @@ import java.util.ResourceBundle;
 
 public class DashboardController implements Initializable {
 
+    // FXML Bindings
     @FXML private FlowPane parkingGrid;
     @FXML private Label lblActiveSlot, lblLiveFee, lblStatusMessage, lblCountdown;
     @FXML private TextField txtHours;
+    @FXML private Button btnAction, btnCancel;
     @FXML private StackPane miniFan;
-    @FXML private Button btnAction, btnCancel; // Added btnCancel
 
-    private String selectedSlotId = null;
-    private final ParkingSession sessionLogic = new ParkingSession();
+    // Shared Data and Logic
+    private ParkingRegistry registry = ParkingRegistry.getInstance();
+    private int selectedSlotId = -1;
     private Timeline countdownTimeline;
-    private int totalSecondsRemaining;
+    private long totalSecondsRemaining;
 
     @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
+    public void initialize(URL url, ResourceBundle rb) {
         startFanAnimation();
-        loadDummySlots();
-        txtHours.textProperty().addListener((obs, old, newValue) -> calculateFeePreview(newValue));
-    }
+        loadSlotsFromRegistry();
 
-    private void calculateFeePreview(String hoursText) {
-        try {
-            if (hoursText == null || hoursText.isEmpty()) {
-                lblLiveFee.setText("TOTAL: $0.00");
-                return;
+        // Live Fee Calculator: $50.00 per hour
+        txtHours.textProperty().addListener((obs, old, val) -> {
+            try {
+                if (val == null || val.isEmpty()) {
+                    lblLiveFee.setText("TOTAL: $0.00");
+                    return;
+                }
+                int h = Integer.parseInt(val);
+                lblLiveFee.setText(String.format("TOTAL: $%.2f", h * 50.00));
+            } catch (Exception e) {
+                lblLiveFee.setText("ERR: INVALID");
             }
-            int hours = Integer.parseInt(hoursText);
-            lblLiveFee.setText(String.format("TOTAL: $%.2f", sessionLogic.calculateFee(hours)));
-        } catch (NumberFormatException e) {
-            lblLiveFee.setText("ERR: INVALID");
-        }
+        });
     }
 
-    private void loadDummySlots() {
+    private void loadSlotsFromRegistry() {
         parkingGrid.getChildren().clear();
-        for (int i = 1; i <= 12; i++) {
-            String slotId = "SLOT-" + String.format("%02d", i);
-            Button slotBtn = new Button(slotId + "\n[FREE]");
-            slotBtn.setPrefSize(120, 80);
-            slotBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: #ff8c00; -fx-border-color: #ff8c00; -fx-font-family: 'Monospaced'; -fx-cursor: hand;");
-            slotBtn.setOnAction(e -> selectSlot(slotId, slotBtn));
-            parkingGrid.getChildren().add(slotBtn);
-        }
-    }
+        registry.slotMap.forEach((id, slot) -> {
+            Button b = new Button("SLOT " + String.format("%02d", id) + "\n" +
+                    (slot.occupied ? "[BUSY]" : "[FREE]"));
+            b.setPrefSize(110, 70);
 
-    private void selectSlot(String id, Button btn) {
-        if (countdownTimeline != null && countdownTimeline.getStatus() == Animation.Status.RUNNING) return;
-        selectedSlotId = id;
-        lblActiveSlot.setText("SLOT: " + id);
-        lblStatusMessage.setText("> " + id + " SELECTED.");
-        loadDummySlots();
-        btn.setStyle("-fx-background-color: #ff8c00; -fx-text-fill: black; -fx-font-family: 'Monospaced';");
+            if (slot.occupied) {
+                b.setStyle("-fx-background-color: #221100; -fx-text-fill: #663300; -fx-border-color: #663300; -fx-font-family: 'Monospaced';");
+                b.setDisable(true);
+            } else if (id == selectedSlotId) {
+                b.setStyle("-fx-background-color: #ff8c00; -fx-text-fill: black; -fx-border-color: #ff8c00; -fx-font-family: 'Monospaced';");
+            } else {
+                b.setStyle("-fx-background-color: transparent; -fx-text-fill: #ff8c00; -fx-border-color: #ff8c00; -fx-font-family: 'Monospaced'; -fx-cursor: hand;");
+            }
+
+            b.setOnAction(e -> {
+                selectedSlotId = id;
+                lblActiveSlot.setText("SLOT: " + String.format("%02d", id));
+                lblStatusMessage.setText("> SLOT_" + String.format("%02d", id) + " SELECTED.");
+                loadSlotsFromRegistry();
+            });
+            parkingGrid.getChildren().add(b);
+        });
     }
 
     @FXML
     private void handlePrimaryAction() {
-        if (selectedSlotId == null) return;
+        if (selectedSlotId == -1) {
+            lblStatusMessage.setText("> ERROR: NO SLOT SELECTED.");
+            return;
+        }
+
         try {
-            int hours = Integer.parseInt(txtHours.getText());
+            String input = txtHours.getText();
+            if (input == null || input.isEmpty()) {
+                lblStatusMessage.setText("> ERROR: INPUT HOURS.");
+                return;
+            }
+
+            int hours = Integer.parseInt(input);
+            AdminController.ParkingSlot slot = registry.slotMap.get(selectedSlotId);
+
+            // Push to Registry
+            slot.occupied = true;
+            slot.plate = "DRV-" + (int)(Math.random() * 8999 + 1000);
+            slot.secondsRemaining = (long) hours * 3600;
+
             lblStatusMessage.setText("> PARKING SUCCESSFUL. SENSORS ACTIVE.");
             startCountdown(hours);
+
+            // Lock UI
             btnAction.setDisable(true);
-            btnCancel.setDisable(false); // Enable Cancel when parked
+            btnCancel.setDisable(false);
             txtHours.setDisable(true);
             parkingGrid.setDisable(true);
+
         } catch (Exception e) {
-            lblStatusMessage.setText("> ERROR: INVALID INPUT.");
+            lblStatusMessage.setText("> ERROR: INVALID DURATION.");
         }
     }
 
+    /**
+     * THIS WAS THE MISSING METHOD CAUSING YOUR ERROR
+     */
     @FXML
     private void handleCancelSession() {
-        // 1. Create the alert as a basic Confirmation type
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-
-        // 2. Remove the "?" Icon and the Header Box
-        alert.initStyle(javafx.stage.StageStyle.UNDECORATED); // Removes the window title bar
+        alert.initStyle(javafx.stage.StageStyle.UNDECORATED);
         alert.setHeaderText(null);
         alert.setGraphic(null);
-
-        // 3. Set the Warning Text
-        alert.setTitle("CRITICAL_WARNING");
-        alert.setContentText(">> WARNING: PARKING SPACE RESERVATION <<\n\n" +
+        alert.setContentText(">> WARNING: PRIVATE_SPACE_RESERVATION <<\n\n" +
                 "TERMINATING THIS SESSION WILL FORFEIT ALL REMAINING TIME.\n" +
                 "CREDITS ARE NON-REFUNDABLE.\n\n" +
                 "PROCEED WITH TERMINATION?");
 
-        // 4. Access the DialogPane to style it
-        DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.setStyle("-fx-background-color: #000000; -fx-border-color: #ff4500; -fx-border-width: 3;");
+        DialogPane dp = alert.getDialogPane();
+        dp.setStyle("-fx-background-color: #000000; -fx-border-color: #ff4500; -fx-border-width: 3;");
+        dp.lookupAll(".label").forEach(node -> node.setStyle("-fx-text-fill: #ff4500; -fx-font-family: 'Monospaced'; -fx-font-weight: bold;"));
 
-        // Style the content text
-        dialogPane.lookupAll(".label").forEach(node -> {
-            node.setStyle("-fx-text-fill: #ff4500; -fx-font-family: 'Monospaced'; -fx-font-weight: bold;");
-        });
+        Button okBtn = (Button) dp.lookupButton(ButtonType.OK);
+        Button cancelBtn = (Button) dp.lookupButton(ButtonType.CANCEL);
 
-        // 5. Style the OK and CANCEL buttons
-        Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
-        Button cancelButton = (Button) dialogPane.lookupButton(ButtonType.CANCEL);
+        String style = "-fx-background-color: black; -fx-text-fill: #ff8c00; -fx-border-color: #ff8c00; -fx-font-family: 'Monospaced';";
+        okBtn.setStyle(style); okBtn.setText("[ YES_TERMINATE ]");
+        cancelBtn.setStyle(style); cancelBtn.setText("[ NO_ABORT ]");
 
-        String btnStyle = "-fx-background-color: #000000; " +
-                "-fx-text-fill: #ff8c00; " +
-                "-fx-border-color: #ff8c00; " +
-                "-fx-border-radius: 0; " +
-                "-fx-font-family: 'Monospaced'; " +
-                "-fx-cursor: hand;";
-
-        okButton.setStyle(btnStyle);
-        okButton.setText("[ YES TERMINATE ]");
-
-        cancelButton.setStyle(btnStyle);
-        cancelButton.setText("[ NO ABORT ]");
-
-        // 6. Logic handling
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            lblStatusMessage.setText("> SESSION TERMINATED. SLOT " + selectedSlotId + " RELEASED.");
             if (countdownTimeline != null) countdownTimeline.stop();
-            resetUI();
-        } else {
-            lblStatusMessage.setText("> TERMINATION ABORTED. SESSION CONTINUES.");
+            lblStatusMessage.setText("> SESSION TERMINATED. NO REFUND ISSUED.");
+            resetDriverUI();
         }
     }
 
     private void startCountdown(int hours) {
-        totalSecondsRemaining = hours * 3600;
+        totalSecondsRemaining = (long) hours * 3600;
+        if (countdownTimeline != null) countdownTimeline.stop();
+
         countdownTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
             totalSecondsRemaining--;
             if (totalSecondsRemaining <= 0) {
                 countdownTimeline.stop();
-                lblStatusMessage.setText("> SESSION EXPIRED.");
-                resetUI();
+                lblStatusMessage.setText("> SESSION EXPIRED. SPACE RELEASED.");
+                resetDriverUI();
             } else {
                 updateTimerLabel();
             }
@@ -161,38 +165,44 @@ public class DashboardController implements Initializable {
     }
 
     private void updateTimerLabel() {
-        int h = totalSecondsRemaining / 3600;
-        int m = (totalSecondsRemaining % 3600) / 60;
-        int s = totalSecondsRemaining % 60;
+        long h = totalSecondsRemaining / 3600;
+        long m = (totalSecondsRemaining % 3600) / 60;
+        long s = totalSecondsRemaining % 60;
         lblCountdown.setText(String.format("%02d:%02d:%02d", h, m, s));
     }
 
-    private void resetUI() {
-        selectedSlotId = null;
+    private void resetDriverUI() {
+        if (selectedSlotId != -1) {
+            AdminController.ParkingSlot slot = registry.slotMap.get(selectedSlotId);
+            slot.occupied = false;
+            slot.secondsRemaining = 0;
+        }
+        selectedSlotId = -1;
         txtHours.clear();
         btnAction.setDisable(false);
-        btnCancel.setDisable(true); // Disable again
+        btnCancel.setDisable(true);
         txtHours.setDisable(false);
         parkingGrid.setDisable(false);
         lblActiveSlot.setText("SLOT: NONE");
         lblLiveFee.setText("TOTAL: $0.00");
         lblCountdown.setText("00:00:00");
-        loadDummySlots();
+        loadSlotsFromRegistry();
     }
 
     private void startFanAnimation() {
-        RotateTransition rt = new RotateTransition(Duration.millis(1500), miniFan);
-        rt.setByAngle(360);
-        rt.setCycleCount(Animation.INDEFINITE);
-        rt.setInterpolator(javafx.animation.Interpolator.LINEAR);
-        rt.play();
+        if (miniFan != null) {
+            RotateTransition rt = new RotateTransition(Duration.millis(1500), miniFan);
+            rt.setByAngle(360);
+            rt.setCycleCount(Animation.INDEFINITE);
+            rt.setInterpolator(Interpolator.LINEAR);
+            rt.play();
+        }
     }
 
     @FXML
     private void handleLogout() throws IOException {
         if (countdownTimeline != null) countdownTimeline.stop();
-        Stage stage = (Stage) btnAction.getScene().getWindow();
-        Parent root = FXMLLoader.load(getClass().getResource("login-view.fxml"));
-        stage.setScene(new Scene(root));
+        Stage s = (Stage) btnAction.getScene().getWindow();
+        s.setScene(new Scene(FXMLLoader.load(getClass().getResource("login-view.fxml"))));
     }
 }
