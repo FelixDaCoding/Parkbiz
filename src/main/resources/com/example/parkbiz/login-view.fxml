@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="450.0" prefWidth="750.0" style="-fx-background-color: #000000;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.parkbiz.LoginController">
+    <children>
+
+        <!-- TOP LEFT FAN -->
+        <StackPane fx:id="fan1" layoutX="40.0" layoutY="40.0" prefHeight="80.0" prefWidth="80.0">
+            <children>
+                <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ff8c0022" height="80.0" stroke="#ff8c00" strokeType="INSIDE" width="10.0" />
+                <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ff8c0022" height="10.0" stroke="#ff8c00" strokeType="INSIDE" width="80.0" />
+            </children>
+        </StackPane>
+
+        <!-- TOP RIGHT FAN -->
+        <StackPane fx:id="fan2" layoutX="630.0" layoutY="40.0" prefHeight="80.0" prefWidth="80.0">
+            <children>
+                <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ff8c0022" height="80.0" stroke="#ff8c00" strokeType="INSIDE" width="10.0" />
+                <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ff8c0022" height="10.0" stroke="#ff8c00" strokeType="INSIDE" width="80.0" />
+            </children>
+        </StackPane>
+
+        <!-- Main Terminal Box -->
+        <VBox alignment="CENTER" layoutX="150.0" layoutY="50.0" prefHeight="350.0" prefWidth="450.0" spacing="20.0" style="-fx-border-color: #ff8c00; -fx-border-width: 2px; -fx-border-radius: 10; -fx-padding: 30; -fx-background-color: #000000;">
+            <children>
+                <VBox alignment="CENTER" spacing="5.0">
+                    <children>
+                        <Text fill="#ff8c00" strokeType="OUTSIDE" strokeWidth="0.0" text="> PARKBIZ_OS_V1.0">
+                            <font>
+                                <Font name="Monospaced Bold" size="28.0" />
+                            </font>
+                        </Text>
+                        <Text fill="#ff8c00" opacity="0.7" strokeType="OUTSIDE" strokeWidth="0.0" text="COOLING_SYSTEM: ACTIVE">
+                            <font>
+                                <Font name="Monospaced Regular" size="12.0" />
+                            </font>
+                        </Text>
+                    </children>
+                </VBox>
+
+                <VBox spacing="15.0">
+                    <children>
+                        <VBox spacing="5.0">
+                            <children>
+                                <Label style="-fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced'; -fx-font-weight: bold;" text="USER_ID:" />
+                                <TextField fx:id="txtUsername" promptText="Enter ID..." style="-fx-background-color: #000000; -fx-text-fill: #ff8c00; -fx-border-color: #ff8c00; -fx-border-width: 1px; -fx-prompt-text-fill: #664100; -fx-font-family: 'Monospaced';" />
+                            </children>
+                        </VBox>
+                        <VBox spacing="5.0">
+                            <children>
+                                <Label style="-fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced'; -fx-font-weight: bold;" text="ACCESS_KEY:" />
+                                <PasswordField fx:id="txtPassword" promptText="********" style="-fx-background-color: #000000; -fx-text-fill: #ff8c00; -fx-border-color: #ff8c00; -fx-border-width: 1px; -fx-prompt-text-fill: #664100; -fx-font-family: 'Monospaced';" />
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+
+                <Label fx:id="lblFeedback" style="-fx-font-family: 'Monospaced';" textFill="#ff8c00" wrapText="true" />
+
+                <Button fx:id="btnLogin" maxWidth="Infinity" onAction="#handleLogin" onMouseEntered="#handleMouseHover" onMouseExited="#handleMouseExit" prefHeight="40.0" style="-fx-background-color: #ff8c00; -fx-text-fill: #000000; -fx-font-family: 'Monospaced'; -fx-font-weight: bold; -fx-cursor: hand;" text="[ INITIALIZE LOGIN ]" />
+
+                <Text fill="#ff8c00" opacity="0.5" strokeType="OUTSIDE" strokeWidth="0.0" text="SECURE_CONNECTION_ESTABLISHED">
+                    <font>
+                        <Font name="Monospaced Regular" size="10.0" />
+                    </font>
+                </Text>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>
