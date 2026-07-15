@@ -26,20 +26,18 @@ public class LoginController implements Initializable {
     @FXML private Label lblFeedback;
     @FXML private Button btnLogin;
 
-    // The two fan containers from FXML
     @FXML private StackPane fan1;
     @FXML private StackPane fan2;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Create rotation for Fan 1 (Clockwise)
+
         RotateTransition rt1 = new RotateTransition(Duration.millis(2000), fan1);
         rt1.setByAngle(360);
         rt1.setCycleCount(Animation.INDEFINITE);
         rt1.setInterpolator(javafx.animation.Interpolator.LINEAR);
         rt1.play();
 
-        // Create rotation for Fan 2 (Counter-Clockwise)
         RotateTransition rt2 = new RotateTransition(Duration.millis(2500), fan2);
         rt2.setByAngle(-360);
         rt2.setCycleCount(Animation.INDEFINITE);
@@ -52,28 +50,29 @@ public class LoginController implements Initializable {
         String username = txtUsername.getText();
         String password = txtPassword.getText();
 
-        if ("admin".equals(username) && "password123".equals(password)) {
-            try {
-                // CHANGE THIS LINE to match your actual filename:
-                var resource = getClass().getResource("dashboard-view.fxml");
-
-                if (resource == null) {
-                    lblFeedback.setText("> ERROR: dashboard-view.fxml NOT FOUND.");
-                    return;
-                }
-
-                Stage stage = (Stage) btnLogin.getScene().getWindow();
-                Parent root = FXMLLoader.load(resource);
-                stage.setScene(new Scene(root));
-                stage.setTitle("ParkBiz - System Monitor");
-
-            } catch (IOException e) {
-                lblFeedback.setText("> SYSTEM_ERROR: FAILED TO LOAD DASHBOARD.");
-                e.printStackTrace();
+        try {
+            if ("admin".equals(username) && "admin123".equals(password)) {
+                // GO TO ADMIN DASHBOARD
+                switchToScene("admin-view.fxml", "ParkBiz - Admin Mainframe");
             }
-        } else {
-            lblFeedback.setText("> ERROR: ACCESS DENIED.");
+            else if ("driver".equals(username) && "1234".equals(password)) {
+                // GO TO DRIVER DASHBOARD
+                switchToScene("dashboard-view.fxml", "ParkBiz - Driver Terminal");
+            }
+            else {
+                lblFeedback.setText("> ACCESS_DENIED: INVALID_CREDENTIALS");
+            }
+        } catch (IOException e) {
+            lblFeedback.setText("> SYSTEM_ERROR: MODULE_NOT_FOUND");
         }
+    }
+
+    // Helper method to reduce duplicate code
+    private void switchToScene(String fxmlFile, String title) throws IOException {
+        Stage stage = (Stage) btnLogin.getScene().getWindow();
+        Parent root = FXMLLoader.load(getClass().getResource(fxmlFile));
+        stage.setScene(new Scene(root));
+        stage.setTitle(title);
     }
 
     @FXML

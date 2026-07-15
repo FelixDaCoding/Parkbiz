@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.FlowPane?>
@@ -16,19 +17,41 @@
 <AnchorPane prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #000000;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.parkbiz.DashboardController">
     <children>
         <!-- SIDEBAR -->
-        <VBox prefWidth="220.0" spacing="15.0" style="-fx-border-color: #ff8c00; -fx-border-width: 0 2 0 0;" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <!-- SIDEBAR -->
+        <!-- SIDEBAR -->
+        <VBox prefWidth="240.0" spacing="15.0" style="-fx-border-color: #ff8c00; -fx-border-width: 0 2 0 0;" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="0.0">
             <padding>
                 <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
             </padding>
             <children>
-                <Text fill="#ff8c00" strokeType="OUTSIDE" strokeWidth="0.0" text="[ MENU ]">
+                <!-- NEW BACK BUTTON -->
+                <Button onAction="#handleLogout" style="-fx-background-color: transparent; -fx-text-fill: #ff8c00; -fx-border-color: #ff8c00; -fx-font-family: 'Monospaced'; -fx-font-size: 10;" text="&lt; BACK_TO_LOGIN" />
+
+                <Text fill="#ff8c00" strokeType="OUTSIDE" strokeWidth="0.0" text="[ RESERVATION ]">
                     <font><Font name="Monospaced Bold" size="18.0" /></font>
                 </Text>
-                <Button maxWidth="Infinity" style="-fx-background-color: #ff8c00; -fx-text-fill: black; -fx-font-family: 'Monospaced'; -fx-font-weight: bold;" text="VIEW SLOTS" />
-                <Button maxWidth="Infinity" style="-fx-background-color: transparent; -fx-text-fill: #ff8c00; -fx-border-color: #ff8c00; -fx-font-family: 'Monospaced';" text="MY RESERVATION" />
-                <Button maxWidth="Infinity" style="-fx-background-color: transparent; -fx-text-fill: #ff8c00; -fx-border-color: #ff8c00; -fx-font-family: 'Monospaced';" text="PAYMENT" />
+
+                <VBox spacing="12.0" style="-fx-border-color: #ff8c00; -fx-padding: 10; -fx-border-style: dashed;">
+                    <children>
+                        <Label fx:id="lblActiveSlot" style="-fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced';" text="SLOT: NONE" />
+                        <VBox spacing="5.0">
+                            <children>
+                                <Label style="-fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced'; -fx-font-size: 10;" text="ENTER HOURS:" />
+                                <TextField fx:id="txtHours" promptText="e.g. 2" style="-fx-background-color: black; -fx-text-fill: #ff8c00; -fx-border-color: #ff8c00; -fx-font-family: 'Monospaced';" />
+                            </children>
+                        </VBox>
+                        <Label fx:id="lblLiveFee" style="-fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced'; -fx-font-weight: bold;" text="TOTAL: $0.00" />
+                    </children>
+                </VBox>
+
+                <Button fx:id="btnAction" maxWidth="Infinity" onAction="#handlePrimaryAction" style="-fx-background-color: #ff8c00; -fx-text-fill: black; -fx-font-family: 'Monospaced'; -fx-font-weight: bold; -fx-cursor: hand;" text="CONFIRM &amp; PARK" />
+
+                <!-- NEW CANCEL BUTTON (Reddish Orange) -->
+                <Button fx:id="btnCancel" onAction="#handleCancelSession" disable="true" maxWidth="Infinity" style="-fx-background-color: transparent; -fx-text-fill: #ff4500; -fx-border-color: #ff4500; -fx-font-family: 'Monospaced'; -fx-cursor: hand;" text="CANCEL SESSION" />
+
                 <VBox VBox.vgrow="ALWAYS" />
-                <Button onAction="#handleLogout" maxWidth="Infinity" style="-fx-background-color: #440000; -fx-text-fill: #ff8c00; -fx-border-color: #ff8c00; -fx-font-family: 'Monospaced';" text="DISCONNECT" />
+
+                <Button maxWidth="Infinity" onAction="#handleLogout" style="-fx-background-color: #000000; -fx-text-fill: #ff8c00; -fx-border-color: #ff8c00; -fx-font-family: 'Monospaced';" text="DISCONNECT" />
             </children>
         </VBox>
 
@@ -73,12 +96,30 @@
                     </content>
                 </ScrollPane>
 
-                <!-- Status Bar -->
-                <HBox style="-fx-border-color: #ff8c00; -fx-border-width: 1 0 0 0; -fx-padding: 10 0 0 0;">
+                <!-- Bottom Terminal -->
+                <VBox spacing="10.0" style="-fx-border-color: #ff8c00; -fx-border-width: 2 0 0 0; -fx-padding: 15 0 0 0;">
                     <children>
-                        <Label fx:id="lblSystemLog" style="-fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced';" text="SYSTEM READY. AWAITING INPUT..." />
+                        <!-- Success / Status Message -->
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <children>
+                                <Text fill="#ff8c00" strokeType="OUTSIDE" strokeWidth="0.0" text="[ STATUS ] ">
+                                    <font><Font name="Monospaced Bold" size="14.0" /></font>
+                                </Text>
+                                <Label fx:id="lblStatusMessage" style="-fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced';" text="AWAITING INITIALIZATION..." />
+                            </children>
+                        </HBox>
+
+                        <!-- Timer Display -->
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <children>
+                                <Text fill="#ff8c00" strokeType="OUTSIDE" strokeWidth="0.0" text="[ TIME_REMAINING ] ">
+                                    <font><Font name="Monospaced Bold" size="14.0" /></font>
+                                </Text>
+                                <Label fx:id="lblCountdown" style="-fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced'; -fx-font-size: 18;" text="00:00:00" />
+                            </children>
+                        </HBox>
                     </children>
-                </HBox>
+                </VBox>
             </children>
         </VBox>
     </children>
