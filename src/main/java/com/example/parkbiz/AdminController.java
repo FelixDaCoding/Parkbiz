@@ -2,8 +2,6 @@ package com.example.parkbiz;
 
 import javafx.animation.*;
 import javafx.fxml.*;
-import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -27,6 +25,9 @@ public class AdminController implements Initializable {
     @FXML private TextArea txtTerminal;
     @FXML private Button btnLogout, btnReport, btnAdd, btnDelete, btnReset, btnCheck;
 
+    // Stage reference for session management
+    private Stage currentStage;
+
     // --- DATA MODEL ---
     public static class ParkingSlot {
         int id;
@@ -37,8 +38,12 @@ public class AdminController implements Initializable {
         long secondsRemaining;
 
         public ParkingSlot(int id, String label, boolean occupied, String plate, long seconds) {
-            this.id = id; this.label = label; this.occupied = occupied;
-            this.plate = plate; this.secondsRemaining = seconds; this.sensorOnline = true;
+            this.id = id;
+            this.label = label;
+            this.occupied = occupied;
+            this.plate = plate;
+            this.secondsRemaining = seconds;
+            this.sensorOnline = true;
         }
     }
 
@@ -47,7 +52,6 @@ public class AdminController implements Initializable {
     private int selectedSlot = 1;
     private final com.sun.management.OperatingSystemMXBean osBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
     private final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
-    private Random random = new Random();
 
     private ParkingRegistry registry = ParkingRegistry.getInstance();
     private ParkingSlot currentlyInspectedSlot;
@@ -61,10 +65,53 @@ public class AdminController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // FIX: Use Platform.runLater to get the stage after scene is ready
+        javafx.application.Platform.runLater(() -> {
+            try {
+                currentStage = (Stage) lblClock.getScene().getWindow();
+                // Save session when window is closed (not logged out)
+                currentStage.setOnCloseRequest(e -> {
+                    saveCurrentSession();
+                });
+                writeToLog("> SESSION_MANAGER_INITIALIZED . . . [OK]");
+            } catch (Exception e) {
+                System.err.println("Could not initialize session manager: " + e.getMessage());
+            }
+        });
+
+        // Clean orphaned reservations on startup
+        try {
+            registry.clearOrphanedReservations();
+            writeToLog("> ORPHANED_RESERVATIONS_CLEANED . . . [OK]");
+        } catch (SQLException e) {
+            writeToLog("> ERR: ORPHANED_CLEAN_FAILED");
+            e.printStackTrace();
+        }
+
         syncWithDatabase();
         startSystemTimelines();
         updateSlotLabel();
         writeToLog("> BOOT_SEQUENCE_COMPLETE . . . [OK]");
+
+        // Check if session was restored
+        if (SessionManager.getInstance().isLoggedIn()) {
+            writeToLog("> SESSION_RESTORED . . . [OK]");
+        }
+    }
+
+    /**
+     * Saves the current session so user can resume after reopening the app
+     */
+    private void saveCurrentSession() {
+        try {
+            int userId = UserSession.getInstance().getUserId();
+            String username = UserSession.getInstance().getUsername();
+            if (userId > 0 && username != null) {
+                SessionManager.getInstance().saveSession(userId, username, "ADMIN", "admin-view.fxml");
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to save session: " + e.getMessage());
+        }
     }
 
     private void syncWithDatabase() {
@@ -74,8 +121,14 @@ public class AdminController implements Initializable {
             if (currentlyInspectedSlot != null) {
                 currentlyInspectedSlot = slotMap.get(currentlyInspectedSlot.id);
             }
+            // Update DB status label
+            lblDbStatus.setText("DB CONN: ONLINE [OK]");
+            lblDbStatus.setStyle("-fx-text-fill: #00ff00; -fx-font-family: 'Monospaced';");
         } catch (SQLException e) {
             writeToLog("> ERR: DATABASE_SYNC_FAILED");
+            // Show DB offline status
+            lblDbStatus.setText("DB CONN: OFFLINE [FAIL]");
+            lblDbStatus.setStyle("-fx-text-fill: #ff0000; -fx-font-family: 'Monospaced';");
         }
     }
 
@@ -129,7 +182,7 @@ public class AdminController implements Initializable {
             writeToLog("DATA_STREAM: PARKING_SUMMARY_v1.0");
             writeToLog("TOTAL_NODES      : " + slotMap.size());
             writeToLog("ACTIVE_SESSIONS  : " + occupiedCount);
-            writeToLog("EST_REVENUE_24H  : $" + String.format("%.2f", occupiedCount * 50.00));
+            writeToLog("EST_REVENUE_24H  : $" + String.format("%.2f", occupiedCount * ParkingRegistry.HOURLY_RATE));
             writeToLog("------------------------------------------");
         }));
         reportDataTimeline.play();
@@ -139,9 +192,12 @@ public class AdminController implements Initializable {
     private void handleAddSlot() {
         try {
             int nid = slotMap.keySet().stream().max(Integer::compare).orElse(0) + 1;
-            registry.addSlotToDatabase(nid); syncWithDatabase();
+            registry.addSlotToDatabase(nid);
+            syncWithDatabase();
             writeToLog("INITIALIZING NODE_" + slotMap.get(nid).label + " . . . [OK]");
-        } catch (SQLException e) { writeToLog("> ERR: SQL_INSERT_REJECTED"); }
+        } catch (SQLException e) {
+            writeToLog("> ERR: SQL_INSERT_REJECTED");
+        }
     }
 
     @FXML
@@ -150,11 +206,17 @@ public class AdminController implements Initializable {
             if (slotMap.size() > 1) {
                 int lid = slotMap.keySet().stream().max(Integer::compare).get();
                 String label = slotMap.get(lid).label;
-                registry.deleteSlotFromDatabase(lid); syncWithDatabase();
-                if (selectedSlot > slotMap.size()) { selectedSlot = slotMap.keySet().stream().max(Integer::compare).get(); updateSlotLabel(); }
+                registry.deleteSlotFromDatabase(lid);
+                syncWithDatabase();
+                if (selectedSlot > slotMap.size()) {
+                    selectedSlot = slotMap.keySet().stream().max(Integer::compare).get();
+                    updateSlotLabel();
+                }
                 writeToLog("DECOMMISSIONING NODE_" + label + " . . . [OFFLINE]");
             }
-        } catch (SQLException e) { writeToLog("> ERR: SQL_DELETE_FAILED"); }
+        } catch (SQLException e) {
+            writeToLog("> ERR: SQL_DELETE_FAILED");
+        }
     }
 
     @FXML
@@ -162,12 +224,20 @@ public class AdminController implements Initializable {
         btnReset.setDisable(true);
         txtTerminal.clear();
         writeToLog("> INITIATING SYSTEM-WIDE DIAGNOSTICS...");
-        for (ParkingSlot s : slotMap.values()) s.sensorOnline = true;
+
         double currentDelay = 500;
         for (ParkingSlot slot : slotMap.values()) {
+            slot.sensorOnline = true;
+            // Update database sensor health
+            try {
+                registry.updateSensorHealth(slot.id, true);
+            } catch (SQLException ex) {
+                writeToLog("> ERR: SENSOR_UPDATE_FAILED for " + slot.label);
+            }
             animateLogWithBuffer("PINGING SENSOR_" + slot.label, "[ONLINE]", currentDelay);
             currentDelay += 900;
         }
+
         Timeline finish = new Timeline(new KeyFrame(Duration.millis(currentDelay + 200), e -> {
             writeToLog("> ALL NODES RESPONDING. SYSTEM NOMINAL.");
             btnReset.setDisable(false);
@@ -195,30 +265,52 @@ public class AdminController implements Initializable {
         popup.initStyle(StageStyle.UNDECORATED);
         HBox root = new HBox(20);
         root.setStyle("-fx-background-color: #000000; -fx-border-color: #ff8c00; -fx-border-width: 3; -fx-padding: 20;");
-        GridPane grid = new GridPane(); grid.setHgap(10); grid.setVgap(10);
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
         liveMapButtons.clear();
 
         for (ParkingSlot slot : slotMap.values()) {
-            Button b = new Button(); b.setPrefSize(110, 75);
+            Button b = new Button();
+            b.setPrefSize(110, 75);
             updateMapButtonDisplay(b, slot);
             liveMapButtons.put(slot.id, b);
-            b.setOnAction(e -> { currentlyInspectedSlot = slot; selectedSlot = slot.id; updateSlotLabel(); updatePopupDetails(); });
+            b.setOnAction(e -> {
+                currentlyInspectedSlot = slot;
+                selectedSlot = slot.id;
+                updateSlotLabel();
+                updatePopupDetails();
+            });
             grid.add(b, (slot.id - 1) % 4, (slot.id - 1) / 4);
         }
 
-        VBox details = new VBox(15); details.setPrefWidth(260);
-        Label head = new Label("[ SLOT_DIAGNOSTICS ]"); head.setStyle("-fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced'; -fx-font-weight: bold;");
-        popSlotNum = new Label("SLOT COORD: --"); popPlate = new Label("OCCUPANT ID: [--]"); popTimer = new Label("TIME REMAINING: 00:00:00");
+        VBox details = new VBox(15);
+        details.setPrefWidth(260);
+        Label head = new Label("[ SLOT_DIAGNOSTICS ]");
+        head.setStyle("-fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced'; -fx-font-weight: bold;");
+        popSlotNum = new Label("SLOT COORD: --");
+        popPlate = new Label("OCCUPANT ID: [--]");
+        popTimer = new Label("TIME REMAINING: 00:00:00");
         String ds = "-fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced'; -fx-font-size: 12;";
-        popSlotNum.setStyle(ds); popPlate.setStyle(ds); popTimer.setStyle(ds);
-        Button close = new Button("[ CLOSE_TERMINAL ]"); close.setStyle("-fx-background-color: #ff8c00; -fx-text-fill: black; -fx-font-family: 'Monospaced'; -fx-cursor: hand;");
-        close.setOnAction(e -> { currentlyInspectedSlot = null; liveMapButtons.clear(); popup.close(); });
+        popSlotNum.setStyle(ds);
+        popPlate.setStyle(ds);
+        popTimer.setStyle(ds);
+        Button close = new Button("[ CLOSE_TERMINAL ]");
+        close.setStyle("-fx-background-color: #ff8c00; -fx-text-fill: black; -fx-font-family: 'Monospaced'; -fx-cursor: hand;");
+        close.setOnAction(e -> {
+            currentlyInspectedSlot = null;
+            liveMapButtons.clear();
+            popup.close();
+        });
         details.getChildren().addAll(head, popSlotNum, popPlate, popTimer, new Separator(), close);
 
-        ScrollPane sp = new ScrollPane(grid); sp.setStyle("-fx-background:black; -fx-background-color:black; -fx-border-color:transparent;");
-        sp.setPrefHeight(350); sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        ScrollPane sp = new ScrollPane(grid);
+        sp.setStyle("-fx-background:black; -fx-background-color:black; -fx-border-color:transparent;");
+        sp.setPrefHeight(350);
+        sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         root.getChildren().addAll(sp, details);
-        popup.setScene(new Scene(root)); popup.show();
+        popup.setScene(new Scene(root));
+        popup.show();
     }
 
     // --- HELPER LOGIC ---
@@ -228,13 +320,19 @@ public class AdminController implements Initializable {
                 new KeyFrame(Duration.millis(initialDelayMs + 200), e -> txtTerminal.appendText(" .")),
                 new KeyFrame(Duration.millis(initialDelayMs + 400), e -> txtTerminal.appendText(" .")),
                 new KeyFrame(Duration.millis(initialDelayMs + 600), e -> txtTerminal.appendText(" . ")),
-                new KeyFrame(Duration.millis(initialDelayMs + 800), e -> { txtTerminal.appendText(finalResult + "\n"); txtTerminal.setScrollTop(Double.MAX_VALUE); })
+                new KeyFrame(Duration.millis(initialDelayMs + 800), e -> {
+                    txtTerminal.appendText(finalResult + "\n");
+                    txtTerminal.setScrollTop(Double.MAX_VALUE);
+                })
         );
         timeline.play();
     }
 
     private void updatePopupDetails() {
         if (currentlyInspectedSlot == null) return;
+        // Safety check: popup might not be open
+        if (popSlotNum == null || popPlate == null || popTimer == null) return;
+
         popSlotNum.setText("SLOT COORD: " + currentlyInspectedSlot.label);
         popPlate.setText("OCCUPANT ID: [" + (currentlyInspectedSlot.sensorOnline ? currentlyInspectedSlot.plate : "ERR_NO_DATA") + "]");
         long s = currentlyInspectedSlot.secondsRemaining;
@@ -244,8 +342,10 @@ public class AdminController implements Initializable {
     private void updateOccupancyDisplay() {
         if (slotMap == null || slotMap.isEmpty()) return;
         long occ = slotMap.values().stream().filter(s -> s.occupied).count();
-        double p = (double) occ / slotMap.size(); StringBuilder b = new StringBuilder();
-        int f = (int) (p * 16); for (int i = 0; i < 16; i++) b.append(i < f ? "█" : "░");
+        double p = (double) occ / slotMap.size();
+        StringBuilder b = new StringBuilder();
+        int f = (int) (p * 16);
+        for (int i = 0; i < 16; i++) b.append(i < f ? "█" : "░");
         lblOccupancy.setText(String.format("SLOTS OCCUPIED: %d / %d [%s] %d%%", occ, slotMap.size(), b.toString(), (int) (p * 100)));
     }
 
@@ -255,40 +355,63 @@ public class AdminController implements Initializable {
     }
 
     private String getBar(double p, int s) {
-        int f = (int) (p * s); StringBuilder b = new StringBuilder();
+        int f = (int) (p * s);
+        StringBuilder b = new StringBuilder();
         for (int i = 0; i < s; i++) b.append(i < f ? "|" : ".");
         return b.toString();
     }
 
+    /**
+     * WRITE TO LOG - PUBLIC METHOD accessible from anywhere in this class
+     */
     public void writeToLog(String m) {
-        txtTerminal.appendText("[" + LocalDateTime.now().format(timeFormat) + "] > " + m + "\n");
-        txtTerminal.setScrollTop(Double.MAX_VALUE);
+        if (txtTerminal != null) {
+            txtTerminal.appendText("[" + LocalDateTime.now().format(timeFormat) + "] > " + m + "\n");
+            txtTerminal.setScrollTop(Double.MAX_VALUE);
+        }
     }
 
-    @FXML private void handleIncrementSlot() {
-        List<Integer> keys = new ArrayList<>(slotMap.keySet()); Collections.sort(keys);
+    @FXML
+    private void handleIncrementSlot() {
+        List<Integer> keys = new ArrayList<>(slotMap.keySet());
+        Collections.sort(keys);
         int currentIndex = keys.indexOf(selectedSlot);
-        if (currentIndex < keys.size() - 1) { selectedSlot = keys.get(currentIndex + 1); updateSlotLabel(); }
+        if (currentIndex < keys.size() - 1) {
+            selectedSlot = keys.get(currentIndex + 1);
+            updateSlotLabel();
+        }
     }
 
-    @FXML private void handleDecrementSlot() {
-        List<Integer> keys = new ArrayList<>(slotMap.keySet()); Collections.sort(keys);
+    @FXML
+    private void handleDecrementSlot() {
+        List<Integer> keys = new ArrayList<>(slotMap.keySet());
+        Collections.sort(keys);
         int currentIndex = keys.indexOf(selectedSlot);
-        if (currentIndex > 0) { selectedSlot = keys.get(currentIndex - 1); updateSlotLabel(); }
+        if (currentIndex > 0) {
+            selectedSlot = keys.get(currentIndex - 1);
+            updateSlotLabel();
+        }
     }
 
-    @FXML private void handleLogout() throws IOException {
+    @FXML
+    private void handleLogout() throws IOException {
+        // Clear session on explicit logout
+        SessionManager.getInstance().clearSession();
         Stage s = (Stage) btnLogout.getScene().getWindow();
         s.setScene(new Scene(FXMLLoader.load(getClass().getResource("login-view.fxml"))));
     }
 
-    @FXML private void onBtnH(javafx.scene.input.MouseEvent e) {
+    @FXML
+    private void onBtnH(javafx.scene.input.MouseEvent e) {
         Button b = (Button) e.getSource();
-        if (b.getText().contains("LOGOUT")) b.setStyle(RED_SOLID); else b.setStyle(AMBER_SOLID);
+        if (b.getText().contains("LOGOUT")) b.setStyle(RED_SOLID);
+        else b.setStyle(AMBER_SOLID);
     }
 
-    @FXML private void onBtnEx(javafx.scene.input.MouseEvent e) {
+    @FXML
+    private void onBtnEx(javafx.scene.input.MouseEvent e) {
         Button b = (Button) e.getSource();
-        if (b.getText().contains("LOGOUT")) b.setStyle(RED_BOX); else b.setStyle(AMBER_BOX);
+        if (b.getText().contains("LOGOUT")) b.setStyle(RED_BOX);
+        else b.setStyle(AMBER_BOX);
     }
 }

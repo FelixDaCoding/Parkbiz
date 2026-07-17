@@ -6,10 +6,17 @@ public class UserSession {
     private String username;
 
     private UserSession() {}
-    public static UserSession getInstance() {
+
+    public static synchronized UserSession getInstance() {
         if (instance == null) instance = new UserSession();
         return instance;
     }
-    public void setUser(int id, String name) { this.userId = id; this.username = name; }
+
+    public void setUser(int id, String name) {
+        this.userId = id;
+        this.username = name;
+    }
+
     public int getUserId() { return userId; }
+    public String getUsername() { return username; }
 }

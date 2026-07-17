@@ -22,9 +22,6 @@
                 <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
             </padding>
             <children>
-                <!-- NEW BACK BUTTON -->
-                <Button onAction="#handleLogout" style="-fx-background-color: transparent; -fx-text-fill: #ff8c00; -fx-border-color: #ff8c00; -fx-font-family: 'Monospaced'; -fx-font-size: 10;" text="&lt; BACK_TO_LOGIN" />
-
                 <Text fill="#ff8c00" strokeType="OUTSIDE" strokeWidth="0.0" text="[ RESERVATION ]">
                     <font><Font name="Monospaced Bold" size="18.0" /></font>
                 </Text>
@@ -44,12 +41,12 @@
 
                 <Button fx:id="btnAction" maxWidth="Infinity" onAction="#handlePrimaryAction" style="-fx-background-color: #ff8c00; -fx-text-fill: black; -fx-font-family: 'Monospaced'; -fx-font-weight: bold; -fx-cursor: hand;" text="CONFIRM &amp; PARK" />
 
-                <!-- NEW CANCEL BUTTON (Reddish Orange) -->
                 <Button fx:id="btnCancel" onAction="#handleCancelSession" disable="true" maxWidth="Infinity" style="-fx-background-color: transparent; -fx-text-fill: #ff4500; -fx-border-color: #ff4500; -fx-font-family: 'Monospaced'; -fx-cursor: hand;" text="CANCEL SESSION" />
 
                 <VBox VBox.vgrow="ALWAYS" />
 
-                <Button maxWidth="Infinity" onAction="#handleLogout" style="-fx-background-color: #000000; -fx-text-fill: #ff8c00; -fx-border-color: #ff8c00; -fx-font-family: 'Monospaced';" text="DISCONNECT" />
+                <!-- Only DISCONNECT button remains -->
+                <Button maxWidth="Infinity" onAction="#handleLogout" style="-fx-background-color: #000000; -fx-text-fill: #ff8c00; -fx-border-color: #ff8c00; -fx-font-family: 'Monospaced'; -fx-cursor: hand;" text="DISCONNECT" />
             </children>
         </VBox>
 

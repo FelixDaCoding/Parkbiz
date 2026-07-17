@@ -20,21 +20,14 @@ public class RegisterController {
 
     @FXML
     public void initialize() {
-        // Spin the aesthetic cooling fan
         RotateTransition rt = new RotateTransition(Duration.millis(2000), fan1);
         rt.setByAngle(360);
         rt.setCycleCount(Animation.INDEFINITE);
         rt.setInterpolator(Interpolator.LINEAR);
         rt.play();
-
-        // Ensure the status label can handle the long sentence
         lblStatus.setWrapText(true);
     }
 
-    /**
-     * Security Protocol: Validates password strength
-     * Pattern: 8+ chars, at least 1 Uppercase, 1 Lowercase, 1 Number
-     */
     private boolean isPasswordSecure(String password) {
         String pattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,}$";
         return password.matches(pattern);
@@ -46,14 +39,12 @@ public class RegisterController {
         String pass = txtPass.getText();
         String confirm = txtConfirm.getText();
 
-        // Check 1: Empty Fields
         if (user.isEmpty() || pass.isEmpty()) {
             lblStatus.setText("> ERR: NULL_POINTER_IN_FIELDS");
             lblStatus.setStyle("-fx-text-fill: #ff4500; -fx-font-family: 'Monospaced';");
             return;
         }
 
-        // Check 2: Specific Password Complexity Requirement
         if (!isPasswordSecure(pass)) {
             lblStatus.setText("[SECURITY BREACH PREVENTION]: PASSWORD CONSTRAINTS VIOLATED!\n" +
                     "Password must be at least 8 characters long and contain a mixture of numerical keys (0-9).");
@@ -61,21 +52,18 @@ public class RegisterController {
             return;
         }
 
-        // Check 3: Password Match
         if (!pass.equals(confirm)) {
             lblStatus.setText("> ERR: VERIFICATION_HASH_MISMATCH");
             lblStatus.setStyle("-fx-text-fill: #ff4500; -fx-font-family: 'Monospaced';");
             return;
         }
 
-        // Check 4: Username length
         if (user.length() < 4) {
             lblStatus.setText("> ERR: USER_ID_TOO_SHORT");
             lblStatus.setStyle("-fx-text-fill: #ff4500; -fx-font-family: 'Monospaced';");
             return;
         }
 
-        // Database Injection via Shared Registry
         String sql = "INSERT INTO users (username, password, role) VALUES (?, ?, 'DRIVER')";
 
         try (Connection conn = DBConnection.getConnection();
@@ -91,7 +79,6 @@ public class RegisterController {
             btnRegister.setDisable(true);
             showSuccessPopup();
 
-            // Automatic redirection to Login
             PauseTransition delay = new PauseTransition(Duration.seconds(2.5));
             delay.setOnFinished(event -> {
                 try {
