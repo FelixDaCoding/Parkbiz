@@ -9,6 +9,7 @@ public class ParkingSlot {
         this.isOccupied = isOccupied;
     }
 
+
     public String getId() { return id; }
     public boolean isOccupied() { return isOccupied; }
     public void setOccupied(boolean occupied) { isOccupied = occupied; }

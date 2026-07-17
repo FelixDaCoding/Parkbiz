@@ -17,8 +17,6 @@
 <AnchorPane prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #000000;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.parkbiz.DashboardController">
     <children>
         <!-- SIDEBAR -->
-        <!-- SIDEBAR -->
-        <!-- SIDEBAR -->
         <VBox prefWidth="240.0" spacing="15.0" style="-fx-border-color: #ff8c00; -fx-border-width: 0 2 0 0;" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="0.0">
             <padding>
                 <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />

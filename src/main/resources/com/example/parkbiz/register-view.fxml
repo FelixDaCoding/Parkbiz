@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="450.0" prefWidth="750.0" style="-fx-background-color: #000000;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.parkbiz.RegisterController">
+    <children>
+        <!-- TOP LEFT FAN -->
+        <StackPane fx:id="fan1" layoutX="40.0" layoutY="40.0" prefHeight="80.0" prefWidth="80.0">
+            <children>
+                <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ff8c0022" height="80.0" stroke="#ff8c00" strokeType="INSIDE" width="10.0" />
+                <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ff8c0022" height="10.0" stroke="#ff8c00" strokeType="INSIDE" width="80.0" />
+            </children>
+        </StackPane>
+
+        <!-- Main Container: Adjusted layoutY and prefHeight to fit more text -->
+        <VBox alignment="CENTER" layoutX="150.0" layoutY="20.0" prefHeight="410.0" prefWidth="450.0" spacing="12.0" style="-fx-border-color: #ff8c00; -fx-border-width: 2px; -fx-border-radius: 10; -fx-padding: 20; -fx-background-color: #000000;">
+            <children>
+                <Text fill="#ff8c00" text="&gt; CREATE_NEW_IDENTITY">
+                    <font><Font name="Monospaced Bold" size="22.0" /></font>
+                </Text>
+
+                <!-- Reduced spacing from 8 to 5 to save vertical room -->
+                <VBox spacing="5.0">
+                    <children>
+                        <Label style="-fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced'; -fx-font-size: 11px;" text="ASSIGN_USER_ID:" />
+                        <TextField fx:id="txtUser" style="-fx-background-color: #000000; -fx-text-fill: #ff8c00; -fx-border-color: #ff8c00; -fx-font-family: 'Monospaced';" />
+
+                        <Label style="-fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced'; -fx-font-size: 11px;" text="SET_ACCESS_KEY:" />
+                        <PasswordField fx:id="txtPass" style="-fx-background-color: #000000; -fx-text-fill: #ff8c00; -fx-border-color: #ff8c00;" />
+
+                        <Label style="-fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced'; -fx-font-size: 11px;" text="CONFIRM_KEY:" />
+                        <PasswordField fx:id="txtConfirm" style="-fx-background-color: #000000; -fx-text-fill: #ff8c00; -fx-border-color: #ff8c00;" />
+                    </children>
+                </VBox>
+
+                <!-- Added minHeight and textAlignment to ensure the full sentence is visible -->
+                <Label fx:id="lblStatus" minHeight="55.0" prefWidth="400.0" style="-fx-font-family: 'Monospaced'; -fx-font-size: 10px;" textAlignment="CENTER" textFill="#ff8c00" wrapText="true" />
+
+                <VBox spacing="8.0" alignment="CENTER">
+                    <children>
+                        <Button fx:id="btnRegister" maxWidth="Infinity" onAction="#handleRegister" prefHeight="35.0" style="-fx-background-color: #ff8c00; -fx-text-fill: #000000; -fx-font-family: 'Monospaced'; -fx-font-weight: bold; -fx-cursor: hand;" text="[ UPLOAD_CREDENTIALS ]" />
+                        <Button onAction="#handleBack" style="-fx-background-color: transparent; -fx-text-fill: #ff8c00; -fx-font-family: 'Monospaced'; -fx-cursor: hand; -fx-font-size: 11px;" text="&lt; BACK_TO_LOGIN" />
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

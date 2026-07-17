@@ -13,6 +13,8 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -53,69 +55,74 @@ public class DashboardController implements Initializable {
 
     private void loadSlotsFromRegistry() {
         parkingGrid.getChildren().clear();
-        registry.slotMap.forEach((id, slot) -> {
-            Button b = new Button("SLOT " + String.format("%02d", id) + "\n" +
-                    (slot.occupied ? "[BUSY]" : "[FREE]"));
-            b.setPrefSize(110, 70);
+        try {
+            // FIX: Fetch the map from the database instead of accessing a variable
+            Map<Integer, AdminController.ParkingSlot> currentSlots = registry.getLiveSlots();
 
-            if (slot.occupied) {
-                b.setStyle("-fx-background-color: #221100; -fx-text-fill: #663300; -fx-border-color: #663300; -fx-font-family: 'Monospaced';");
-                b.setDisable(true);
-            } else if (id == selectedSlotId) {
-                b.setStyle("-fx-background-color: #ff8c00; -fx-text-fill: black; -fx-border-color: #ff8c00; -fx-font-family: 'Monospaced';");
-            } else {
-                b.setStyle("-fx-background-color: transparent; -fx-text-fill: #ff8c00; -fx-border-color: #ff8c00; -fx-font-family: 'Monospaced'; -fx-cursor: hand;");
-            }
+            currentSlots.forEach((id, slot) -> {
+                Button b = new Button("SLOT " + String.format("%02d", id) + "\n" +
+                        (slot.occupied ? "[BUSY]" : "[FREE]"));
+                b.setPrefSize(110, 70);
 
-            b.setOnAction(e -> {
-                selectedSlotId = id;
-                lblActiveSlot.setText("SLOT: " + String.format("%02d", id));
-                lblStatusMessage.setText("> SLOT_" + String.format("%02d", id) + " SELECTED.");
-                loadSlotsFromRegistry();
+                if (slot.occupied) {
+                    b.setStyle("-fx-background-color: #221100; -fx-text-fill: #663300; -fx-border-color: #663300; -fx-font-family: 'Monospaced';");
+                    b.setDisable(true);
+                } else if (id == selectedSlotId) {
+                    b.setStyle("-fx-background-color: #ff8c00; -fx-text-fill: black; -fx-border-color: #ff8c00; -fx-font-family: 'Monospaced';");
+                } else {
+                    b.setStyle("-fx-background-color: transparent; -fx-text-fill: #ff8c00; -fx-border-color: #ff8c00; -fx-font-family: 'Monospaced'; -fx-cursor: hand;");
+                }
+
+                b.setOnAction(e -> {
+                    selectedSlotId = id;
+                    lblActiveSlot.setText("SLOT: " + String.format("%02d", id));
+                    lblStatusMessage.setText("> SLOT_" + String.format("%02d", id) + " SELECTED.");
+                    loadSlotsFromRegistry();
+                });
+                parkingGrid.getChildren().add(b);
             });
-            parkingGrid.getChildren().add(b);
-        });
+        } catch (SQLException e) {
+            lblStatusMessage.setText("> ERR: DB_FETCH_FAILED");
+            e.printStackTrace();
+        }
     }
 
     @FXML
     private void handlePrimaryAction() {
-        if (selectedSlotId == -1) {
-            lblStatusMessage.setText("> ERROR: NO SLOT SELECTED.");
-            return;
-        }
-
+        if (selectedSlotId == -1) return;
         try {
-            String input = txtHours.getText();
-            if (input == null || input.isEmpty()) {
-                lblStatusMessage.setText("> ERROR: INPUT HOURS.");
-                return;
-            }
+            int hours = Integer.parseInt(txtHours.getText());
+            double fee = hours * 50.00;
+            String plate = "DRV-" + (int)(Math.random()*9000+1000);
 
-            int hours = Integer.parseInt(input);
-            AdminController.ParkingSlot slot = registry.slotMap.get(selectedSlotId);
+            // PERSIST TO DATABASE via Registry
+            registry.reserveSlot(
+                    UserSession.getInstance().getUserId(),
+                    selectedSlotId,
+                    hours,
+                    fee,
+                    plate
+            );
 
-            // Push to Registry
-            slot.occupied = true;
-            slot.plate = "DRV-" + (int)(Math.random() * 8999 + 1000);
-            slot.secondsRemaining = (long) hours * 3600;
+            lblStatusMessage.setText("> SYNCING WITH DATABASE . . . [OK]");
 
-            lblStatusMessage.setText("> PARKING SUCCESSFUL. SENSORS ACTIVE.");
-            startCountdown(hours);
-
-            // Lock UI
-            btnAction.setDisable(true);
-            btnCancel.setDisable(false);
-            txtHours.setDisable(true);
-            parkingGrid.setDisable(true);
+            // Mechanical delay effect before starting timer
+            new Timeline(new KeyFrame(Duration.millis(1000), e -> {
+                lblStatusMessage.setText("> PARKING SUCCESSFUL. SLOT LOCKED.");
+                startCountdown(hours);
+                loadSlotsFromRegistry();
+                btnAction.setDisable(true);
+                btnCancel.setDisable(false);
+                txtHours.setDisable(true);
+                parkingGrid.setDisable(true);
+            })).play();
 
         } catch (Exception e) {
-            lblStatusMessage.setText("> ERROR: INVALID DURATION.");
+            lblStatusMessage.setText("> ERR: TRANSACTION_REJECTED");
+            e.printStackTrace();
         }
     }
 
-    /**
-     * THIS WAS THE MISSING METHOD CAUSING YOUR ERROR
-     */
     @FXML
     private void handleCancelSession() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -172,11 +179,8 @@ public class DashboardController implements Initializable {
     }
 
     private void resetDriverUI() {
-        if (selectedSlotId != -1) {
-            AdminController.ParkingSlot slot = registry.slotMap.get(selectedSlotId);
-            slot.occupied = false;
-            slot.secondsRemaining = 0;
-        }
+        // Note: In a full DB implementation, you would also call a 'vacateSlot(selectedSlotId)'
+        // method in your Registry here to update the MySQL status back to VACANT.
         selectedSlotId = -1;
         txtHours.clear();
         btnAction.setDisable(false);

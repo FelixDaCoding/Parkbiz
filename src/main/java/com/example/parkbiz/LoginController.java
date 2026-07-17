@@ -18,6 +18,9 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -50,37 +53,57 @@ public class LoginController implements Initializable {
 
     @FXML
     private void handleLogin() {
-        String username = txtUsername.getText();
-        String password = txtPassword.getText();
+        String user = txtUsername.getText();
+        String pass = txtPassword.getText();
 
-        try {
-            // Admin Credentials
-            if ("admin".equals(username) && "admin123".equals(password)) {
-                // Changed filename to match yours: admin-view.fxml
-                switchToScene("admin-view.fxml", "ParkBiz - Admin Mainframe V1.0");
-            }
-            // Driver Credentials
-            else if ("driver".equals(username) && "1234".equals(password)) {
-                switchToScene("dashboard-view.fxml", "ParkBiz - Driver Terminal");
-            }
-            else {
-                lblFeedback.setText("> ACCESS_DENIED: INVALID_CREDENTIALS");
+        String query = "SELECT id, role FROM users WHERE username = ? AND password = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, user);
+            pstmt.setString(2, pass);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                int id = rs.getInt("id");
+                String role = rs.getString("role");
+
+                // Store session
+                UserSession.getInstance().setUser(id, user);
+
+                if (role.equals("ADMIN")) {
+                    switchToScene("admin-view.fxml", "PARKBIZ - ADMIN_MAINFRAME");
+                } else {
+                    switchToScene("dashboard-view.fxml", "PARKBIZ - DRIVER_TERMINAL");
+                }
+            } else {
+                lblFeedback.setText("> ERROR: AUTH_FAILED . . . [INVALID]");
                 lblFeedback.setStyle("-fx-text-fill: #ff4500; -fx-font-family: 'Monospaced';");
             }
         } catch (Exception e) {
-            lblFeedback.setText("> SYSTEM_ERROR: MODULE_LOAD_FAILED");
-            System.err.println("Error loading FXML: " + e.getMessage());
+            lblFeedback.setText("> SYSTEM_ERROR: DATABASE_OFFLINE");
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * THIS METHOD FIXES YOUR ERROR
+     * It allows the Login screen to switch to the Registration screen
+     */
+    @FXML
+    private void handleShowRegister() {
+        try {
+            switchToScene("register-view.fxml", "PARKBIZ - IDENTITY_MANAGEMENT");
+        } catch (IOException e) {
+            lblFeedback.setText("> SYSTEM_ERR: REGISTER_MODULE_NOT_FOUND");
             e.printStackTrace();
         }
     }
 
     private void switchToScene(String fxmlFile, String title) throws IOException {
         Stage stage = (Stage) btnLogin.getScene().getWindow();
-
-        // Load the FXML
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(fxmlFile)));
-
-        // Update the stage
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.setTitle(title);
