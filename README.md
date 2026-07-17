@@ -68,7 +68,6 @@ private static final String PASS = "your_password";
 3. Run the App
 bash
 mvn clean javafx:run
-
 Database Schema
 sql
 -- Users Table
@@ -113,7 +112,6 @@ INSERT INTO parking_slots (slot_label, status, sensor_health) VALUES
 ('A3', 'VACANT', 'ONLINE'),
 ('B1', 'VACANT', 'ONLINE'),
 ('B2', 'VACANT', 'ONLINE');
-
 How to Use
 Driver Flow
 Login with driver / 1234
@@ -141,33 +139,42 @@ View live map for slot details
 
 Generate reports for revenue stats
 
-
 Tech Stack
 Component	Technology
 Frontend	JavaFX, FXML, CSS
 Backend	Java
 Database	MySQL/MariaDB
 Architecture	MVC, Singleton Pattern
-
 Project Structure
-
+text
 parkbiz/
-├── src/main/java/com/example/parkbiz/
-│   ├── AdminController.java
-│   ├── DashboardController.java
-│   ├── LoginController.java
-│   ├── RegisterController.java
-│   ├── ParkingRegistry.java
-│   ├── UserSession.java
-│   ├── SessionManager.java
-│   ├── DBConnection.java
-│   ├── LoginApp.java
-│   └── Launcher.java
-├── src/main/resources/
-│   ├── admin-view.fxml
-│   ├── dashboard-view.fxml
-│   ├── login-view.fxml
-│   └── register-view.fxml
+│
+├── src/
+│   └── main/
+│       ├── java/
+│       │   └── com/
+│       │       └── example/
+│       │           └── parkbiz/
+│       │               ├── AdminController.java
+│       │               ├── DashboardController.java
+│       │               ├── LoginController.java
+│       │               ├── RegisterController.java
+│       │               ├── ParkingRegistry.java
+│       │               ├── UserSession.java
+│       │               ├── SessionManager.java
+│       │               ├── DBConnection.java
+│       │               ├── LoginApp.java
+│       │               └── Launcher.java
+│       │
+│       └── resources/
+│           ├── admin-view.fxml
+│           ├── dashboard-view.fxml
+│           ├── login-view.fxml
+│           └── register-view.fxml
+│
 ├── database/
 │   └── parkbiz_db.sql
-└── pom.xml
+│
+├── pom.xml
+└── README.md
+ParkBiz - Where Parking Meets Cyber!
