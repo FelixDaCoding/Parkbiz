@@ -55,17 +55,17 @@ Java 21+
 
 MySQL/MariaDB 8.0+
 
-1. Import Database
+Step 1: Import Database
 bash
 mysql -u root -p < database/parkbiz_db.sql
-2. Configure Connection
+Step 2: Configure Connection
 Edit DBConnection.java:
 
 java
 private static final String URL = "jdbc:mysql://localhost:3306/parkbiz_db";
 private static final String USER = "root";
 private static final String PASS = "your_password";
-3. Run the App
+Step 3: Run the App
 bash
 mvn clean javafx:run
 Database Schema
@@ -105,7 +105,7 @@ INSERT INTO users (username, password, role) VALUES
 ('admin', 'admin123', 'ADMIN'),
 ('driver', '1234', 'DRIVER');
 
--- Default Slots (3x2 Grid)
+-- Default Slots
 INSERT INTO parking_slots (slot_label, status, sensor_health) VALUES
 ('A1', 'VACANT', 'ONLINE'),
 ('A2', 'VACANT', 'ONLINE'),
@@ -113,31 +113,31 @@ INSERT INTO parking_slots (slot_label, status, sensor_health) VALUES
 ('B1', 'VACANT', 'ONLINE'),
 ('B2', 'VACANT', 'ONLINE');
 How to Use
-Driver Flow
+Driver
 Login with driver / 1234
 
-Select an available slot from the grid
+Select an available slot
 
 Enter hours (1-24)
 
 Click CONFIRM & PARK
 
-Watch the countdown timer
+Watch countdown timer
 
-Cancel or let it expire to release slot
+Cancel or let expire to release slot
 
-Admin Flow
+Admin
 Login with admin / admin123
 
-Monitor system metrics and occupancy
+Monitor system metrics
 
-Add/Delete slots as needed
+Add/Delete slots
 
-Reset sensors for diagnostics
+Reset sensors
 
-View live map for slot details
+View live map
 
-Generate reports for revenue stats
+Generate reports
 
 Tech Stack
 Component	Technology
@@ -145,36 +145,4 @@ Frontend	JavaFX, FXML, CSS
 Backend	Java
 Database	MySQL/MariaDB
 Architecture	MVC, Singleton Pattern
-Project Structure
-text
-parkbiz/
-│
-├── src/
-│   └── main/
-│       ├── java/
-│       │   └── com/
-│       │       └── example/
-│       │           └── parkbiz/
-│       │               ├── AdminController.java
-│       │               ├── DashboardController.java
-│       │               ├── LoginController.java
-│       │               ├── RegisterController.java
-│       │               ├── ParkingRegistry.java
-│       │               ├── UserSession.java
-│       │               ├── SessionManager.java
-│       │               ├── DBConnection.java
-│       │               ├── LoginApp.java
-│       │               └── Launcher.java
-│       │
-│       └── resources/
-│           ├── admin-view.fxml
-│           ├── dashboard-view.fxml
-│           ├── login-view.fxml
-│           └── register-view.fxml
-│
-├── database/
-│   └── parkbiz_db.sql
-│
-├── pom.xml
-└── README.md
 ParkBiz - Where Parking Meets Cyber!
