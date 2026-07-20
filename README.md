@@ -1,36 +1,17 @@
-ParkBiz - Cyber Parking Management System
-A real-time parking management desktop application built with JavaFX and MySQL with a cyber/terminal aesthetic.
+**ParkBiz** - Cyber Parking Management System
+A real-time parking management desktop application built with JavaFX and MySQL.
 
-Overview
-ParkBiz is a real-time parking management system featuring persistent user sessions, dynamic timer calculations, and role-based access control for ADMIN and DRIVER users. The system employs Java Serialization for session persistence and follows SOLID design principles for maintainable, scalable architecture.
+********Overview********
+ParkBiz is a real-time parking management system with a cyber/terminal aesthetic. It features persistent sessions, dynamic timer calculations, and role-based access control for ADMIN and DRIVER users.
 
-Features
-Core Features
-Role-based Authentication - Admin and Driver login with secure validation
-User Registration - Password strength enforcement (8+ chars with alphanumeric)
-Real-time Parking - Live slot monitoring with occupancy status
-Dynamic Timer - Countdown with auto-vacation on expiry
-Fee Calculator - $50/hour with instant total display
-System Monitoring - CPU, RAM, and database connection status (Admin only)
-Slot Management - Add/Delete slots with automatic labeling (Admin only)
-Live Map View - Interactive slot inspection (Admin only)
-Report Generation - Revenue and occupancy summaries (Admin only)
+********Features********
+**Authentication & Sessions**
+Role-based login (ADMIN/DRIVER)
+User registration with password validation
+Persistent sessions - stay logged in after closing
+Session recovery - resume where you left off
 
-Java Serialization Implementation
-The system uses Java Serialization to maintain persistent user sessions across application restarts.
-
-How It Works
-Creation: Upon successful login, SessionManager serializes user data (userId, username, role, lastView, timestamp) to ~/.parkbiz_session.dat
-Validation: On startup, the system checks for existing session file and auto-redirects users
-Expiry: Sessions automatically expire after 24 hours
-Deletion: Session file is securely deleted on explicit logout
-
-Key Classes
-SessionManager - Handles all serialization operations
-SessionData - Serializable container for session payload
-LoginApp - Entry point that checks for existing sessions
-
-SOLID Design Principles Applied
+****SOLID Design Principles Applied****
 1. Single Responsibility Principle (SRP)
 Each class handles one specific responsibility:
 
@@ -51,55 +32,87 @@ public class AdminController implements Initializable {
     private ParkingRegistry registry = ParkingRegistry.getInstance();
     // Depends on abstract service, not concrete DB implementation
 }
-
 Benefits:
-Loose coupling between UI and business logic
-Easy to mock for testing
-Flexible for future database changes
 
-Quick Start
-Prerequisites
+**Driver Dashboard**
+Real-time slot availability
+
+Quick parking with hour selection
+
+Live fee calculator ($50/hour)
+
+Countdown timer for active sessions
+
+Cancel session with confirmation dialog
+
+**Admin Mainframe**
+Live slot monitoring with occupancy status
+
+System metrics (CPU, RAM, DB connection)
+
+Terminal-style logging output
+Add/Delete slots dynamically
+Reset sensors with diagnostics
+Interactive live map view
+Generate revenue reports
+
+**Database Features**
+Dynamic timestamp calculations
+Auto-vacation of expired slots
+Orphaned reservation cleanup
+Transaction management with rollback
+
+********Quick Start********
+**Prerequisites**
 Java 21+
-
 XAMPP (MySQL/MariaDB)
-
 IntelliJ IDEA (or any Java IDE)
 
-Database Setup
-Download parkbiz_db.sql from the repository
+**Step 1: Download Database**
+Download parkbiz_db.sql from the repository.
 
-Open XAMPP → Start MySQL → Open phpMyAdmin
-
+**Step 2: Import Database**
+Open XAMPP Control Panel
+Start MySQL
+Open phpMyAdmin (http://localhost/phpmyadmin)
+Click New on the left sidebar
 Create database named parkbiz_db
+Click Import tab
+Choose the parkbiz_db.sql file
+Click Go
 
-Import the SQL file
+**Step 3: Run the App**
+Open the project in IntelliJ IDEA
+Navigate to Launcher.java
+Click the Run button (green triangle)
+Login with credentials below
 
-Run Application
-Open project in IntelliJ IDEA
-
-Navigate to LoginApp.java
-
-Click Run
-
-Default Credentials
+**Default Credentials**
 Role	Username	Password
-Admin	admin	admin123
-Driver	driver	1234
+Admin	admin	    admin123
+Driver	driver	    1234
 
-How to Use
-Driver Mode
-Login with driver / 1234
+********How to Use********
+
+**Driver**
+Login with [**driver / 1234**]
 Select an available slot
 Enter hours (1-24)
 Click CONFIRM & PARK
 Watch countdown timer
 Cancel or let expire to release slot
 
-Admin Mode
-Login with admin / admin123
+**Admin**
+Login with [**admin / admin123**]
 Monitor system metrics
 Add/Delete slots
 Reset sensors
 View live map
 Generate reports
 
+**Tech Stack**
+Component	  Technology
+Frontend	  JavaFX, FXML, CSS
+Backend	      Java
+Database	  MySQL/MariaDB
+Architecture  MVC, Singleton Pattern
