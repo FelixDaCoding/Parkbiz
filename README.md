@@ -7,21 +7,13 @@ ParkBiz is a real-time parking management system featuring persistent user sessi
 Features
 Core Features
 Role-based Authentication - Admin and Driver login with secure validation
-
 User Registration - Password strength enforcement (8+ chars with alphanumeric)
-
 Real-time Parking - Live slot monitoring with occupancy status
-
 Dynamic Timer - Countdown with auto-vacation on expiry
-
 Fee Calculator - $50/hour with instant total display
-
 System Monitoring - CPU, RAM, and database connection status (Admin only)
-
 Slot Management - Add/Delete slots with automatic labeling (Admin only)
-
 Live Map View - Interactive slot inspection (Admin only)
-
 Report Generation - Revenue and occupancy summaries (Admin only)
 
 Java Serialization Implementation
@@ -29,18 +21,13 @@ The system uses Java Serialization to maintain persistent user sessions across a
 
 How It Works
 Creation: Upon successful login, SessionManager serializes user data (userId, username, role, lastView, timestamp) to ~/.parkbiz_session.dat
-
 Validation: On startup, the system checks for existing session file and auto-redirects users
-
 Expiry: Sessions automatically expire after 24 hours
-
 Deletion: Session file is securely deleted on explicit logout
 
 Key Classes
 SessionManager - Handles all serialization operations
-
 SessionData - Serializable container for session payload
-
 LoginApp - Entry point that checks for existing sessions
 
 SOLID Design Principles Applied
@@ -64,12 +51,10 @@ public class AdminController implements Initializable {
     private ParkingRegistry registry = ParkingRegistry.getInstance();
     // Depends on abstract service, not concrete DB implementation
 }
+
 Benefits:
-
 Loose coupling between UI and business logic
-
 Easy to mock for testing
-
 Flexible for future database changes
 
 Quick Start
@@ -100,54 +85,21 @@ Default Credentials
 Role	Username	Password
 Admin	admin	admin123
 Driver	driver	1234
+
 How to Use
 Driver Mode
 Login with driver / 1234
-
 Select an available slot
-
 Enter hours (1-24)
-
 Click CONFIRM & PARK
-
 Watch countdown timer
-
 Cancel or let expire to release slot
 
 Admin Mode
 Login with admin / admin123
-
 Monitor system metrics
-
 Add/Delete slots
-
 Reset sensors
-
 View live map
-
 Generate reports
 
-Tech Stack
-Component	Technology
-Frontend	JavaFX, FXML, CSS
-Backend	Java (JDK 21)
-Database	MySQL/MariaDB
-Architecture	MVC, Singleton Pattern
-Serialization	Java Serialization
-Project Structure
-text
-com.example.parkbiz/
-├── AdminController.java        # Admin dashboard
-├── DashboardController.java    # Driver dashboard
-├── LoginController.java        # Authentication
-├── RegisterController.java     # Registration
-├── LoginApp.java               # Entry point
-├── DBConnection.java           # Database connectivity (SRP)
-├── ParkingRegistry.java        # Parking operations (SRP, DIP)
-├── SessionManager.java         # Session serialization (SRP)
-├── UserSession.java            # In-memory state
-└── resources/
-    ├── admin-view.fxml
-    ├── dashboard-view.fxml
-    ├── login-view.fxml
-    └── register-view.fxml
