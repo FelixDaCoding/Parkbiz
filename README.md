@@ -35,6 +35,7 @@ public class AdminController implements Initializable {
 Benefits:
 
 **Driver Dashboard**
+
 Real-time slot availability
 
 Quick parking with hour selection
@@ -46,6 +47,7 @@ Countdown timer for active sessions
 Cancel session with confirmation dialog
 
 **Admin Mainframe**
+
 Live slot monitoring with occupancy status
 
 System metrics (CPU, RAM, DB connection)
