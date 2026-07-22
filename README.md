@@ -1,120 +1,147 @@
-**ParkBiz** - Cyber Parking Management System
+# ParkBiz - Cyber Parking Management System
+
 A real-time parking management desktop application built with JavaFX and MySQL.
 
-********Overview********
+## Overview
+
 ParkBiz is a real-time parking management system with a cyber/terminal aesthetic. It features persistent sessions, dynamic timer calculations, and role-based access control for ADMIN and DRIVER users.
 
-********Features********
-**Authentication & Sessions**
-Role-based login (ADMIN/DRIVER)
-User registration with password validation
-Persistent sessions - stay logged in after closing
-Session recovery - resume where you left off
+## Features
 
-****SOLID Design Principles Applied****
-1. Single Responsibility Principle (SRP)
+### Authentication & Sessions
+- Role-based login (ADMIN/DRIVER)
+- User registration with password validation
+- Persistent sessions - stay logged in after closing
+- Session recovery - resume where you left off
+
+### Driver Dashboard
+- Real-time slot availability
+- Quick parking with hour selection
+- Live fee calculator ($50/hour)
+- Countdown timer for active sessions
+- Cancel session with confirmation dialog
+
+### Admin Mainframe
+- Live slot monitoring with occupancy status
+- System metrics (CPU, RAM, DB connection)
+- Terminal-style logging output
+- Add/Delete slots dynamically
+- Reset sensors with diagnostics
+- Interactive live map view
+- Generate revenue reports
+
+### Database Features
+- Dynamic timestamp calculations
+- Auto-vacation of expired slots
+- Orphaned reservation cleanup
+- Transaction management with rollback
+
+## SOLID Design Principles Applied
+
+### Single Responsibility Principle (SRP)
 Each class handles one specific responsibility:
 
-Class	Responsibility
-DBConnection	Database connectivity only
-ParkingRegistry	Parking data operations (CRUD, reservations)
-SessionManager	Session serialization and persistence
-UserSession	In-memory current user state
-AdminController	Admin UI event handling
-DashboardController	Driver UI event handling
-Example: ParkingRegistry handles ALL database operations, keeping controllers free from SQL logic.
+| Class | Responsibility |
+|-------|---------------|
+| DBConnection | Database connectivity only |
+| ParkingRegistry | Parking data operations (CRUD, reservations) |
+| SessionManager | Session serialization and persistence |
+| UserSession | In-memory current user state |
+| AdminController | Admin UI event handling |
+| DashboardController | Driver UI event handling |
 
-2. Dependency Inversion Principle (DIP)
+**Example**: ParkingRegistry handles ALL database operations, keeping controllers free from SQL logic.
+
+### Dependency Inversion Principle (DIP)
 Controllers depend on abstractions rather than concrete implementations:
 
-java
+```java
 public class AdminController implements Initializable {
     private ParkingRegistry registry = ParkingRegistry.getInstance();
     // Depends on abstract service, not concrete DB implementation
 }
-Benefits:
+```
 
-**Driver Dashboard**
+**Benefits**: Loose coupling, easy testing, flexible for future changes.
 
-Real-time slot availability
+## Behavioral Design Pattern Applied
 
-Quick parking with hour selection
+### Observer Pattern
+The system uses JavaFX Timeline and KeyFrame to implement the Observer pattern for real-time UI updates:
 
-Live fee calculator ($50/hour)
+```java
+// Real-time updates every second
+Timeline global = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
+    lblClock.setText("SYSTEM TIME: " + LocalDateTime.now().format(timeFormat));
+    syncWithDatabase(); // Observes time changes and updates UI
+    // Update all slot buttons
+    for (Map.Entry<Integer, Button> entry : liveMapButtons.entrySet()) {
+        ParkingSlot s = slotMap.get(entry.getKey());
+        if (s != null) updateMapButtonDisplay(entry.getValue(), s);
+    }
+}));
+global.setCycleCount(Animation.INDEFINITE);
+global.play();
+```
 
-Countdown timer for active sessions
+**How it works**: The Timeline acts as the Subject that observes time changes every second. All registered KeyFrame handlers are Observers that get notified and update the UI components (clock, database sync, slot displays) automatically.
 
-Cancel session with confirmation dialog
+## Quick Start
 
-**Admin Mainframe**
+### Prerequisites
+- Java 21+
+- XAMPP (MySQL/MariaDB)
+- IntelliJ IDEA (or any Java IDE)
 
-Live slot monitoring with occupancy status
-
-System metrics (CPU, RAM, DB connection)
-
-Terminal-style logging output
-Add/Delete slots dynamically
-Reset sensors with diagnostics
-Interactive live map view
-Generate revenue reports
-
-**Database Features**
-Dynamic timestamp calculations
-Auto-vacation of expired slots
-Orphaned reservation cleanup
-Transaction management with rollback
-
-********Quick Start********
-**Prerequisites**
-Java 21+
-XAMPP (MySQL/MariaDB)
-IntelliJ IDEA (or any Java IDE)
-
-**Step 1: Download Database**
+### Step 1: Download Database
 Download parkbiz_db.sql from the repository.
 
-**Step 2: Import Database**
-Open XAMPP Control Panel
-Start MySQL
-Open phpMyAdmin (http://localhost/phpmyadmin)
-Click New on the left sidebar
-Create database named parkbiz_db
-Click Import tab
-Choose the parkbiz_db.sql file
-Click Go
+### Step 2: Import Database
+1. Open XAMPP Control Panel
+2. Start MySQL
+3. Open phpMyAdmin (http://localhost/phpmyadmin)
+4. Click New on the left sidebar
+5. Create database named parkbiz_db
+6. Click Import tab
+7. Choose the parkbiz_db.sql file
+8. Click Go
 
-**Step 3: Run the App**
-Open the project in IntelliJ IDEA
-Navigate to Launcher.java
-Click the Run button (green triangle)
-Login with credentials below
+### Step 3: Run the App
+1. Open the project in IntelliJ IDEA
+2. Navigate to LoginApp.java
+3. Click the Run button (green triangle)
+4. Login with credentials below
 
-**Default Credentials**
-Role	Username	Password
-Admin	admin	    admin123
-Driver	driver	    1234
+### Default Credentials
 
-********How to Use********
+| Role | Username | Password |
+|------|----------|----------|
+| Admin | admin | admin123 |
+| Driver | driver | 1234 |
 
-**Driver**
-Login with [**driver / 1234**]
-Select an available slot
-Enter hours (1-24)
-Click CONFIRM & PARK
-Watch countdown timer
-Cancel or let expire to release slot
+## How to Use
 
-**Admin**
-Login with [**admin / admin123**]
-Monitor system metrics
-Add/Delete slots
-Reset sensors
-View live map
-Generate reports
+### Driver
+1. Login with [driver / 1234]
+2. Select an available slot
+3. Enter hours (1-24)
+4. Click CONFIRM & PARK
+5. Watch countdown timer
+6. Cancel or let expire to release slot
 
-**Tech Stack**
-Component	  Technology
-Frontend	  JavaFX, FXML, CSS
-Backend	      Java
-Database	  MySQL/MariaDB
-Architecture  MVC, Singleton Pattern
+### Admin
+1. Login with [admin / admin123]
+2. Monitor system metrics
+3. Add/Delete slots
+4. Reset sensors
+5. View live map
+6. Generate reports
+
+## Tech Stack
+
+| Component | Technology |
+|-----------|------------|
+| Frontend | JavaFX, FXML, CSS |
+| Backend | Java |
+| Database | MySQL/MariaDB |
+| Architecture | MVC, Singleton Pattern |
