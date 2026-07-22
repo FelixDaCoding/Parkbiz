@@ -1,4 +1,4 @@
-<img width="4037" height="3012" alt="Untitled Diagram drawio" src="https://github.com/user-attachments/assets/fb9bf5ea-f19f-434e-a70f-ee395b784070" /># ParkBiz - Cyber Parking Management System
+# ParkBiz - Cyber Parking Management System
 
 A real-time parking management desktop application built with JavaFX and MySQL.
 
