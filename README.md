@@ -84,20 +84,21 @@ global.play();
 
 **How it works**: The Timeline acts as the Subject that observes time changes every second. All registered KeyFrame handlers are Observers that get notified and update the UI components (clock, database sync, slot displays) automatically.
 
-
-
 ## UML Diagrams
 
-Click the links below to view the UML diagrams:
+Click the images below to view full-size UML diagrams:
 
-| Diagram | Link |
-|---------|------|
-| **Class Diagram** | [View Class Diagram](https://github.com/user-attachments/assets/a5a1233c-9fe3-422f-bfb4-1ceec80322e3) |
-| **Use-Case Diagram** | [View Use-Case Diagram](https://github.com/user-attachments/assets/f3672837-7381-4480-b45c-46970a9d6b18) |
-| **Activity Diagram** | [View Activity Diagram](https://github.com/user-attachments/assets/7724a681-7b2d-4d09-b5ec-0aafee106db3) |
-| **Sequence Diagram** | [View Sequence Diagram](https://github.com/user-attachments/assets/2cebb783-ca43-4e89-bc7a-b66a9a4a37e8) |
+### Class Diagram
+[![Class Diagram](https://github.com/user-attachments/assets/e2a91614-f53c-43df-bf8b-ee926c20637e)](https://github.com/user-attachments/assets/e2a91614-f53c-43df-bf8b-ee926c20637e)
 
+### Activity Diagram
+[![Activity Diagram](https://github.com/user-attachments/assets/4e5adaef-6ab2-4bac-b239-997cf8bee9e9)](https://github.com/user-attachments/assets/4e5adaef-6ab2-4bac-b239-997cf8bee9e9)
 
+### Sequence Diagram
+[![Sequence Diagram](https://github.com/user-attachments/assets/a3010619-200d-4e8c-adf2-79cb12c32445)](https://github.com/user-attachments/assets/a3010619-200d-4e8c-adf2-79cb12c32445)
+
+### Use-Case Diagram
+[![Use-Case Diagram](https://github.com/user-attachments/assets/01931f7c-63e6-457a-ae0d-01d286496c08)](https://github.com/user-attachments/assets/01931f7c-63e6-457a-ae0d-01d286496c08)
 
 ## Quick Start
 
