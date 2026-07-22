@@ -92,7 +92,7 @@ Click the links below to view full-size UML diagrams:
 |---------|------|
 | **Class Diagram** | [View Class Diagram](https://github.com/user-attachments/assets/c60a0835-e105-45cc-b4a1-3509da97884e) |
 | **Activity Diagram** | [View Activity Diagram](https://github.com/user-attachments/assets/4a2de67f-a780-4d99-b4b2-80fa119db80c) |
-| **Sequence Diagram** | [View Sequence Diagram](https://github.com/user-attachments/assets/904a4198-ca1d-48f4-b2ae-c7d58ddf40fb) |
+| **Sequence Diagram** | [View Sequence Diagram](https://github.com/user-attachments/assets/8242dcc9-4e1c-46b6-8e1e-27b96c114889) |
 | **Use-Case Diagram** | [View Use-Case Diagram](https://github.com/user-attachments/assets/30bce598-76aa-496f-b6e3-dcc12e0f3fcf) |
 
 ## Quick Start
