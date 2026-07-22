@@ -58,7 +58,6 @@ Controllers depend on abstractions rather than concrete implementations:
 ```java
 public class AdminController implements Initializable {
     private ParkingRegistry registry = ParkingRegistry.getInstance();
-    // Depends on abstract service, not concrete DB implementation
 }
 ```
 
@@ -70,7 +69,6 @@ public class AdminController implements Initializable {
 The system uses JavaFX Timeline and KeyFrame to implement the Observer pattern for real-time UI updates:
 
 ```java
-// Real-time updates every second
 Timeline global = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
     lblClock.setText("SYSTEM TIME: " + LocalDateTime.now().format(timeFormat));
     syncWithDatabase(); // Observes time changes and updates UI
