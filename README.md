@@ -99,16 +99,6 @@ Click the links below to view full-size UML diagrams:
 
 > **🖱️ [Click here to view the full UML diagram collection](https://github.com/user-attachments/assets/2b2d2039-a099-4161-b214-948a78ebee72)** - Open in new tab for zoom and pan
 
-<details>
-<summary><b>📊 Diagram Preview (click to expand)</b></summary>
-
-<br>
-
-*All diagrams combined in one view for easy reference. Click the link above for full resolution.*
-
-</details>
-
-
 
 ## Quick Start
 
