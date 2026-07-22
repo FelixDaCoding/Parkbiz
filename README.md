@@ -97,7 +97,7 @@ Click the links below to view full-size UML diagrams:
 
 ### Complete Diagram Collection
 
-> **🖱️ [Click here to view the full UML diagram collection](https://github.com/user-attachments/assets/2b2d2039-a099-4161-b214-948a78ebee72)** - Open in new tab for zoom and pan
+> **[Click here to view the full UML diagram collection](https://github.com/user-attachments/assets/2b2d2039-a099-4161-b214-948a78ebee72)** - Open in new tab for zoom and pan
 
 
 ## Quick Start
