@@ -89,6 +89,7 @@ global.play();
 **UML Diagrams**
 
 **--Please Click the Picture to view--**
+
 Class Diagram
 <img width="16228" height="12128" alt="image" src="https://github.com/user-attachments/assets/a5a1233c-9fe3-422f-bfb4-1ceec80322e3" />
 
