@@ -1,6 +1,7 @@
 package com.example.parkbiz;
 
 import javafx.animation.*;
+import javafx.application.Platform;
 import javafx.fxml.*;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -65,8 +66,18 @@ public class AdminController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // FIX: Use Platform.runLater to get the stage after scene is ready
-        javafx.application.Platform.runLater(() -> {
+        // Check if session is valid - redirect to login if not
+        if (!SessionManager.getInstance().isLoggedIn()) {
+            try {
+                redirectToLogin();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return;
+        }
+
+        // Use Platform.runLater to get the stage after scene is ready
+        Platform.runLater(() -> {
             try {
                 currentStage = (Stage) lblClock.getScene().getWindow();
                 // Save session when window is closed (not logged out)
@@ -100,14 +111,36 @@ public class AdminController implements Initializable {
     }
 
     /**
+     * Redirects user to login screen if session is invalid
+     */
+    private void redirectToLogin() throws IOException {
+        Platform.runLater(() -> {
+            try {
+                Stage stage = (Stage) lblClock.getScene().getWindow();
+                Scene scene = new Scene(FXMLLoader.load(getClass().getResource("login-view.fxml")));
+                stage.setScene(scene);
+                stage.setTitle("ParkBiz - Business Login");
+                stage.centerOnScreen();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    /**
      * Saves the current session so user can resume after reopening the app
      */
     private void saveCurrentSession() {
         try {
-            int userId = UserSession.getInstance().getUserId();
-            String username = UserSession.getInstance().getUsername();
-            if (userId > 0 && username != null) {
-                SessionManager.getInstance().saveSession(userId, username, "ADMIN", "admin-view.fxml");
+            // Get from SessionManager directly, not UserSession
+            if (SessionManager.getInstance().isLoggedIn()) {
+                SessionManager.getInstance().saveSession(
+                        SessionManager.getInstance().getUserId(),
+                        SessionManager.getInstance().getUsername(),
+                        "ADMIN",
+                        "admin-view.fxml"
+                );
+                System.out.println("Admin session saved on close");
             }
         } catch (Exception e) {
             System.err.println("Failed to save session: " + e.getMessage());
@@ -398,7 +431,10 @@ public class AdminController implements Initializable {
         // Clear session on explicit logout
         SessionManager.getInstance().clearSession();
         Stage s = (Stage) btnLogout.getScene().getWindow();
-        s.setScene(new Scene(FXMLLoader.load(getClass().getResource("login-view.fxml"))));
+        Scene scene = new Scene(FXMLLoader.load(getClass().getResource("login-view.fxml")));
+        s.setScene(scene);
+        s.setTitle("ParkBiz - Business Login");
+        s.centerOnScreen();
     }
 
     @FXML

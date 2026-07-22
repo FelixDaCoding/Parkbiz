@@ -3,6 +3,7 @@ package com.example.parkbiz;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.RotateTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -38,9 +39,8 @@ public class LoginController implements Initializable {
         startFan(fan1, 2000, 360);
         startFan(fan2, 2500, -360);
 
-        // FIX: Use Platform.runLater to check session after scene is ready
-        javafx.application.Platform.runLater(() -> {
-            // Check if already logged in AND session is valid
+        // Check if already logged in AND session is valid
+        Platform.runLater(() -> {
             if (SessionManager.getInstance().isLoggedIn()) {
                 try {
                     String view = SessionManager.getInstance().getRole().equals("ADMIN") ?
@@ -48,7 +48,6 @@ public class LoginController implements Initializable {
                     String title = SessionManager.getInstance().getRole().equals("ADMIN") ?
                             "PARKBIZ - ADMIN_MAINFRAME" : "PARKBIZ - DRIVER_TERMINAL";
 
-                    // Make sure we don't redirect if we're already on the login screen
                     Stage stage = (Stage) btnLogin.getScene().getWindow();
                     if (stage != null) {
                         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(view)));
@@ -76,8 +75,15 @@ public class LoginController implements Initializable {
 
     @FXML
     private void handleLogin() {
-        String user = txtUsername.getText();
+        String user = txtUsername.getText().trim();
         String pass = txtPassword.getText();
+
+        // Input validation
+        if (user.isEmpty() || pass.isEmpty()) {
+            lblFeedback.setText("> ERROR: FIELDS_CANNOT_BE_EMPTY");
+            lblFeedback.setStyle("-fx-text-fill: #ff4500; -fx-font-family: 'Monospaced';");
+            return;
+        }
 
         String query = "SELECT id, role FROM users WHERE username = ? AND password = ?";
 
@@ -110,6 +116,7 @@ public class LoginController implements Initializable {
             }
         } catch (Exception e) {
             lblFeedback.setText("> SYSTEM_ERROR: DATABASE_OFFLINE");
+            lblFeedback.setStyle("-fx-text-fill: #ff4500; -fx-font-family: 'Monospaced';");
             e.printStackTrace();
         }
     }
@@ -120,6 +127,7 @@ public class LoginController implements Initializable {
             switchToScene("register-view.fxml", "PARKBIZ - IDENTITY_MANAGEMENT");
         } catch (IOException e) {
             lblFeedback.setText("> SYSTEM_ERR: REGISTER_MODULE_NOT_FOUND");
+            lblFeedback.setStyle("-fx-text-fill: #ff4500; -fx-font-family: 'Monospaced';");
             e.printStackTrace();
         }
     }
