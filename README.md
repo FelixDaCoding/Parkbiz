@@ -86,19 +86,14 @@ global.play();
 
 ## UML Diagrams
 
-Click the images below to view full-size UML diagrams:
+Click the links below to view full-size UML diagrams:
 
-### Class Diagram
-[![Class Diagram](https://github.com/user-attachments/assets/e2a91614-f53c-43df-bf8b-ee926c20637e)](https://github.com/user-attachments/assets/e2a91614-f53c-43df-bf8b-ee926c20637e)
-
-### Activity Diagram
-[![Activity Diagram](https://github.com/user-attachments/assets/4e5adaef-6ab2-4bac-b239-997cf8bee9e9)](https://github.com/user-attachments/assets/4e5adaef-6ab2-4bac-b239-997cf8bee9e9)
-
-### Sequence Diagram
-[![Sequence Diagram](https://github.com/user-attachments/assets/a3010619-200d-4e8c-adf2-79cb12c32445)](https://github.com/user-attachments/assets/a3010619-200d-4e8c-adf2-79cb12c32445)
-
-### Use-Case Diagram
-[![Use-Case Diagram](https://github.com/user-attachments/assets/01931f7c-63e6-457a-ae0d-01d286496c08)](https://github.com/user-attachments/assets/01931f7c-63e6-457a-ae0d-01d286496c08)
+| Diagram | Link |
+|---------|------|
+| **Class Diagram** | [View Class Diagram](https://github.com/user-attachments/assets/c60a0835-e105-45cc-b4a1-3509da97884e) |
+| **Activity Diagram** | [View Activity Diagram](https://github.com/user-attachments/assets/4a2de67f-a780-4d99-b4b2-80fa119db80c) |
+| **Sequence Diagram** | [View Sequence Diagram](https://github.com/user-attachments/assets/904a4198-ca1d-48f4-b2ae-c7d58ddf40fb) |
+| **Use-Case Diagram** | [View Use-Case Diagram](https://github.com/user-attachments/assets/30bce598-76aa-496f-b6e3-dcc12e0f3fcf) |
 
 ## Quick Start
 
