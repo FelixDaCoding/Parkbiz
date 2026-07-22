@@ -1,4 +1,4 @@
-# ParkBiz - Cyber Parking Management System
+<img width="4037" height="3012" alt="Untitled Diagram drawio" src="https://github.com/user-attachments/assets/fb9bf5ea-f19f-434e-a70f-ee395b784070" /># ParkBiz - Cyber Parking Management System
 
 A real-time parking management desktop application built with JavaFX and MySQL.
 
@@ -83,6 +83,18 @@ global.play();
 ```
 
 **How it works**: The Timeline acts as the Subject that observes time changes every second. All registered KeyFrame handlers are Observers that get notified and update the UI components (clock, database sync, slot displays) automatically.
+
+
+**UML Diagrams**
+
+Class Diagram
+<img width="4037" height="3012" alt="Untitled Diagram drawio" src="https://github.com/user-attachments/assets/900ac173-f0fe-4d80-ac76-1dbd970fac0f" />
+
+
+
+
+
+
 
 ## Quick Start
 
