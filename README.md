@@ -85,12 +85,20 @@ global.play();
 **How it works**: The Timeline acts as the Subject that observes time changes every second. All registered KeyFrame handlers are Observers that get notified and update the UI components (clock, database sync, slot displays) automatically.
 
 
+
 **UML Diagrams**
 
 Class Diagram
 <img width="16228" height="12128" alt="image" src="https://github.com/user-attachments/assets/a5a1233c-9fe3-422f-bfb4-1ceec80322e3" />
 
+Use-Case Diagram
+<img width="7836" height="8788" alt="image" src="https://github.com/user-attachments/assets/f3672837-7381-4480-b45c-46970a9d6b18" />
 
+Activity Diagram
+<img width="4888" height="15236" alt="image" src="https://github.com/user-attachments/assets/7724a681-7b2d-4d09-b5ec-0aafee106db3" />
+
+Sequence Diagram
+<img width="6112" height="11820" alt="image" src="https://github.com/user-attachments/assets/2cebb783-ca43-4e89-bc7a-b66a9a4a37e8" />
 
 
 
