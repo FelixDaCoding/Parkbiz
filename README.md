@@ -95,7 +95,19 @@ Click the links below to view full-size UML diagrams:
 | **Sequence Diagram** | [View Sequence Diagram](https://github.com/user-attachments/assets/8242dcc9-4e1c-46b6-8e1e-27b96c114889) |
 | **Use-Case Diagram** | [View Use-Case Diagram](https://github.com/user-attachments/assets/30bce598-76aa-496f-b6e3-dcc12e0f3fcf) |
 
-<img width="4212" height="9827" alt="Untitled Diagram drawio (1)" src="https://github.com/user-attachments/assets/1eb92b9a-1e87-4868-9d7e-6258bc437219" />
+### 📐 Complete Diagram Collection
+
+> **🖱️ [Click here to view the full UML diagram collection](https://github.com/user-attachments/assets/2b2d2039-a099-4161-b214-948a78ebee72)** - Open in new tab for zoom and pan
+
+<details>
+<summary><b>📊 Diagram Preview (click to expand)</b></summary>
+
+<br>
+
+*All diagrams combined in one view for easy reference. Click the link above for full resolution.*
+
+</details>
+
 
 
 ## Quick Start
