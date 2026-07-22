@@ -88,7 +88,7 @@ global.play();
 **UML Diagrams**
 
 Class Diagram
-<img width="4037" height="3012" alt="Untitled Diagram drawio" src="https://github.com/user-attachments/assets/900ac173-f0fe-4d80-ac76-1dbd970fac0f" />
+<img width="16228" height="12128" alt="image" src="https://github.com/user-attachments/assets/a5a1233c-9fe3-422f-bfb4-1ceec80322e3" />
 
 
 
