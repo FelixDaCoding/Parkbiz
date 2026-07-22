@@ -95,7 +95,7 @@ Click the links below to view full-size UML diagrams:
 | **Sequence Diagram** | [View Sequence Diagram](https://github.com/user-attachments/assets/8242dcc9-4e1c-46b6-8e1e-27b96c114889) |
 | **Use-Case Diagram** | [View Use-Case Diagram](https://github.com/user-attachments/assets/30bce598-76aa-496f-b6e3-dcc12e0f3fcf) |
 
-### 📐 Complete Diagram Collection
+### Complete Diagram Collection
 
 > **🖱️ [Click here to view the full UML diagram collection](https://github.com/user-attachments/assets/2b2d2039-a099-4161-b214-948a78ebee72)** - Open in new tab for zoom and pan
 
